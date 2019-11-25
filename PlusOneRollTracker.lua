@@ -2,7 +2,7 @@ local _, core = ...
 
 core.rolls = {}
 core.framepool = {}
-core.usePlusOne = true
+core.usePlusOne = false
 
 core.defaults = {
   addonColor = "ea00ff",
@@ -49,6 +49,12 @@ function core:IgnoreRoll(name)
   end
 end
 
+-- CLASS COLOR TEXT
+function core:ClassColorText(text, class)
+  local string = "|cFF"..core.ClassColors[class]..text.."|r"
+  return string
+end
+
 -- UPDATE
 function core:Update()
 
@@ -72,10 +78,16 @@ function core:Update()
   for i, player in ipairs(core.rolls) do
     for ii, frame in ipairs(scrollChildren) do
       if not frame.used then
+        local coloredName = core:ClassColorText(player.name, player.class)
         frame:SetHeight(ROLLFRAME_HEIGHT)
-        frame.name:SetText(player.name)
+        frame.name:SetText(coloredName)
         frame.roll:SetText(player.roll)
-        frame.plusone:SetText(PORTDB[name] or "")
+        if PORTDB[player.name] ~= nil then 
+          frame.plusone:SetText("+"..PORTDB[player.name])
+        else 
+          frame.plusone:SetText("") 
+        end
+        
         frame.class:SetText(core.ClassIcons[player.class])
         frame.used = true
         frame:Show()
@@ -149,7 +161,7 @@ function events:CHAT_MSG_SYSTEM(msg)
       temp.name = name
       temp.roll = roll
       temp.class = class
-      if PORTDB[name] ~= nil then temp.plusone = PORTDB[name] end
+      temp.plusone = PORTDB[name] or 0
 
       tinsert(core.rolls, temp)
     end
@@ -165,9 +177,11 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
   if string.find(msg, itemLinkpattern) ~= nil then
     if string.find(msg, plusOnePattern) ~= nil then
       core.usePlusOne = true
+      core.addon.plusoneCB:SetChecked(true)
       core:ClearRolls()
     else
       core.usePlusOne = false
+      core.addon.plusoneCB:SetChecked(false)
       core:ClearRolls()
     end
   end
@@ -243,7 +257,7 @@ function core:CreateMenu()
   addon:SetBackdrop(backdrop)
 
   local title = addon:CreateFontString(nil, "OVERLAY")
-  title:SetPoint("TOPLEFT", addon, "TOPLEFT", 7, -7)
+  title:SetPoint("TOPLEFT", addon, "TOPLEFT", 10, -10)
   title:SetFontObject("GameFontNormal")
   title:SetText("+1 RollTracker")
   addon.title = title
@@ -273,6 +287,23 @@ function core:CreateMenu()
   addon.resetBtn = resetBtn
 
 
+  local plusoneCB = CreateFrame("CheckButton", nil, addon, "UICheckButtonTemplate")
+  plusoneCB:SetSize(30,30)
+  plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 5)
+  plusoneCB:SetScript("OnClick", function(self, button) 
+    core.usePlusOne = self:GetChecked()
+    core:Update()
+  end)
+  plusoneCB:SetChecked(core.usePlusOne)
+  addon.plusoneCB = plusoneCB
+
+  local cbText = plusoneCB:CreateFontString(nil, "OVERLAY")
+  cbText:SetPoint("LEFT", plusoneCB, "RIGHT", 3)
+  cbText:SetFontObject("GameFontNormalSmall")
+  cbText:SetText("+1 roll")
+  addon.cbText = cbText
+
+
 
   local scrollFrame = CreateFrame("ScrollFrame", nil, addon, "UIPanelScrollFrameTemplate")
   scrollFrame:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 5, -7)
@@ -299,16 +330,18 @@ function core:CreateMenu()
     tempFrame:SetSize(scrollFrame:GetWidth(), ROLLFRAME_HEIGHT)
     tempFrame:Show()
     tempFrame:SetScript("OnMouseDown", function(self, button)
+      
       if button == "LeftButton" then
-        local name = self:GetParent().name:GetText()
+        local name = self.name:GetText()
         if PORTDB[name] == nil then
           PORTDB[name] = 1
         else
           PORTDB[name] = PORTDB[name]+1
         end
+        self.plusone:SetText(PORTDB[name])
 
       elseif button == "RightButton" then
-        local name = self:GetParent().name:GetText()
+        local name = self.name:GetText()
         core:IgnoreRoll(name)
         core:Update()
       end
@@ -361,7 +394,7 @@ function core:CreateMenu()
     tempFrame.isHelper = false
     tempFrame:Hide()
 
-    frame["rollFrame"..i] = frame
+    addon["rollFrame"..i] = frame
 
     tinsert(core.framepool, frame)
   end
@@ -391,4 +424,16 @@ core.ClassIcons = {
   PRIEST = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:128:196:64:128|t",
   WARLOCK = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:196:256:64:128|t",
   PALADIN = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:0:64:128:196|t"
+}
+
+core.ClassColors = {
+  DRUID = "FF7D0A",
+  HUNTER = "A9D271",
+  MAGE = "40C7EB",
+  PALADIN = "F58CBA",
+  PRIEST = "FFFFFF",
+  ROGUE = "FFF569",
+  SHAMAN = "0070DE",
+  WARLOCK = "8787ED",
+  WARRIOR = "C79C6E"
 }
