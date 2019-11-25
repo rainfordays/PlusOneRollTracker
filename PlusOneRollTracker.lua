@@ -40,6 +40,15 @@ function core:ClearRolls()
   core:Update()
 end
 
+-- IGNORE ROLL
+function core:IgnoreRoll(name)
+  for i, player in ipairs(core.rolls) do
+    if player.name == name then
+      player.roll = 0
+    end
+  end
+end
+
 -- UPDATE
 function core:Update()
 
@@ -47,7 +56,7 @@ function core:Update()
 
   for i, frame in ipairs(scrollChildren) do
     if frame.isHelper == false then
-      frame:SetHeight(ROLLFRAME_HIDDEN_HEIGHT)
+      frame:Hide()
       frame.used = false
     end
   end
@@ -275,6 +284,9 @@ function core:CreateMenu()
   --scrollChild:SetHeight(1000)
   addon.scrollChild = scrollChild
 
+
+
+  -- ROLL FRAMES
   for i = 1, 40 do
     local childframes = { scrollChild:GetChildren() }
 
@@ -286,6 +298,21 @@ function core:CreateMenu()
     end
     tempFrame:SetSize(scrollFrame:GetWidth(), ROLLFRAME_HEIGHT)
     tempFrame:Show()
+    tempFrame:SetScript("OnMouseDown", function(self, button)
+      if button == "LeftButton" then
+        local name = self:GetParent().name:GetText()
+        if PORTDB[name] == nil then
+          PORTDB[name] = 1
+        else
+          PORTDB[name] = PORTDB[name]+1
+        end
+
+      elseif button == "RightButton" then
+        local name = self:GetParent().name:GetText()
+        core:IgnoreRoll(name)
+        core:Update()
+      end
+    end)
 
 
     local plusoneFrame = CreateFrame("Frame", nil, tempFrame)
@@ -332,11 +359,13 @@ function core:CreateMenu()
 
     tempFrame.used = false
     tempFrame.isHelper = false
+    tempFrame:Hide()
 
     frame["rollFrame"..i] = frame
 
     tinsert(core.framepool, frame)
   end
+  -- ROLL FRAMES END
 
 
   scrollFrame:SetScrollChild(scrollChild)
