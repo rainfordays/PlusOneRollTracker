@@ -4,6 +4,11 @@ core.rolls = {}
 core.framepool = {}
 core.usePlusOne = true
 
+core.defaults = {
+  addonColor = "ea00ff",
+  addonPrefix = "|cffea00ffPlusOneRollTracker|r "
+}
+
 ROLLFRAME_HEIGHT = 15
 ROLLFRAME_HIDDEN_HEIGHT = 0
 
@@ -109,7 +114,7 @@ function events:ADDON_LOADED(name)
   SlashCmdList.PLUSONEROLLTRACKER = function(msg)
     core:SlashCommand(msg)
   end
-  core:Print("|cffff2200PlusOneRollTracker|r by |cffFFF569Mayushi|r on |cffff0000Gehennas|r. /+1 or /plusone to open addon.")
+  core:Print(core.defaults.addonPrefix .. "by |cffFFF569Mayushi|r on |cffff0000Gehennas|r. /+1 or /plusone to open addon.")
 end
 
 
