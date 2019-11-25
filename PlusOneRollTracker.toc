@@ -1,0 +1,10 @@
+## Interface: 11302
+## Title: |cffea00ffPlusOneRollTracker|r
+## Author: RainForDays
+## Notes: Track rolls and +1 status in raids.
+## Version: 1.0
+## DefaultState: enabled
+## SavedVariablesPerCharacter: PlusOneRollTrackerDB
+
+
+PlusOneRollTracker.lua
