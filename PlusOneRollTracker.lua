@@ -82,12 +82,7 @@ function core:Update()
         frame:SetHeight(ROLLFRAME_HEIGHT)
         frame.name:SetText(coloredName)
         frame.roll:SetText(player.roll)
-        if PORTDB[player.name] ~= nil then 
-          frame.plusone:SetText("+"..PORTDB[player.name])
-        else 
-          frame.plusone:SetText("") 
-        end
-        
+        frame.plusone:SetText(PORTDB[player.name] and "+"..PORTDB[player.name] or "")
         frame.class:SetText(core.ClassIcons[player.class])
         frame.used = true
         frame:Show()
