@@ -4,21 +4,21 @@ local _, core = ...
 core.framepool = {}
 core.currentRollItem = ""
 
-core.defaults = {
-  addonColor = "ea00ff",
-  addonPrefix = "|cffea00ffPlusOneRollTracker|r"
-}
+core.defaults = {}
+core.defaults.color = "FF69B4"
+core.defaults.addonPrefix = "|cff".. core.defaults.color .."PlusOne RollTracker|r"
 
-ROLLFRAME_HEIGHT = 15
-ROLLFRAME_HIDDEN_HEIGHT = 0
+local function addonColor(text)
+  return "|cff"..core.defaults.color..text.."|r "
+end
 
 
 -- SORT FUNCTIONS
-function sortRegular(a, b)
+local function sortRegular(a, b)
   return a.roll > b.roll
 end
 
-function sortPlusOne(a, b)
+local function sortPlusOne(a, b)
   return (a.plusone < b.plusone) or (a.plusone == b.plusone and a.roll > b.roll)
 end
 
@@ -43,28 +43,42 @@ end
 -- CLEAR ROLLS
 function core:ClearRolls()
   PORTDB.rolls = {}
-  core:Update()
 end
 
 -- IGNORE ROLL
 function core:IgnoreRoll(name)
-  for i, player in ipairs(PORTDB.rolls) do
+  for _, player in ipairs(PORTDB.rolls) do
     if player.name == name then
       player.roll = 0
     end
   end
 end
 
--- CLASS COLOR TEXT
-function core:ClassColorText(text, class)
-  local string = "|cFF"..core.ClassColors[class]..text.."|r"
-  return string
+-- COLOR TEXT
+function core:colorText(text, color)
+  return "|cff".. core.colors[color] .. ""..text.."|r"
 end
+
+core.colors = {
+  common = "ffffff",
+  uncommon = "1eff00",
+  rare = "0070dd",
+  epic = "a335ee",
+  DRUID = "FF7D0A",
+  HUNTER = "A9D271",
+  MAGE = "40C7EB",
+  PALADIN = "F58CBA",
+  PRIEST = "FFFFFF",
+  ROGUE = "FFF569",
+  SHAMAN = "0070DE",
+  WARLOCK = "8787ED",
+  WARRIOR = "C79C6E"
+}
 
 -- UPDATE
 function core:Update()
 
-  scrollChildren = { core.addon.scrollChild:GetChildren() }
+  local scrollChildren = { core.addon.scrollChild:GetChildren() }
 
   for i, frame in ipairs(scrollChildren) do
     if frame.isHelper == false then
@@ -81,16 +95,14 @@ function core:Update()
 
 
 
-  for i, player in ipairs(PORTDB.rolls) do
-    for ii, frame in ipairs(scrollChildren) do
+  for _, player in ipairs(PORTDB.rolls) do
+    for _, frame in ipairs(scrollChildren) do
       if not frame.used then
-        local coloredName = core:ClassColorText(player.name, player.class)
-        local name = player.name
-        frame:SetHeight(ROLLFRAME_HEIGHT)
+        local coloredName = core:colorText(player.name, player.class)
+        frame:SetHeight(15)
         frame.name:SetText(coloredName)
         frame.roll:SetText(player.roll)
         frame.plusone:SetText(PORTDB.plusOne[player.name] and "+"..PORTDB.plusOne[player.name] or "")
-        
         frame.class:SetText(core.ClassIcons[player.class])
         frame.used = true
         frame:Show()
@@ -105,173 +117,51 @@ end
 
 
 
-----------------------------
----- EVENTS
-----------------------------
-
-local events = CreateFrame("Frame")
-events:RegisterEvent("ADDON_LOADED")
-events:RegisterEvent("CHAT_MSG_SYSTEM")
-events:RegisterEvent("CHAT_MSG_RAID_WARNING")
-events:RegisterEvent("CHAT_MSG_RAID")
-events:RegisterEvent("LOOT_OPENED")
-events:SetScript("OnEvent", function(self, event, ...)
-  return self[event] and self[event](self, ...)
-end)
-
-
-function events:ADDON_LOADED(name)
-  if name ~= "PlusOneRollTracker" then return end
-
-  if PlusOneRollTrackerDB == nil then PlusOneRollTrackerDB = {} end
-  PORTDB = PlusOneRollTrackerDB
-
-  if PORTDB.rolls == nil then PORTDB.rolls = {} end
-  if PORTDB.usePlusOne == nil then PORTDB.usePlusOne = false end
-  if PORTDB.monstersLooted == nil then PORTDB.monstersLooted = {} end
-  if PORTDB.plusOne == nil then PORTDB.plusOne = {} end
-
-
-  local f=InterfaceOptionsFrame
-  f:SetMovable(true)
-  f:EnableMouse(true)
-  f:SetUserPlaced(true)
-  f:SetScript("OnMouseDown", f.StartMoving)
-  f:SetScript("OnMouseUp", f.StopMovingOrSizing)
-
-
-  SLASH_PLUSONEROLLTRACKER1= "/+1"
-  SLASH_PLUSONEROLLTRACKER2= "/plusone"
-  SlashCmdList.PLUSONEROLLTRACKER = function(msg)
-    core:SlashCommand(msg)
-  end
-  core:Print(core.defaults.addonPrefix .. " by |cffFFF569Mayushi|r on |cffff0000Gehennas|r. /+1 or /plusone to open addon.")
-end
-
-
-function events:CHAT_MSG_SYSTEM(msg)
-  local pattern = RANDOM_ROLL_RESULT
-  pattern = pattern:gsub("%(", "%%(")
-  pattern = pattern:gsub("%)", "%%)")
-  pattern = pattern:gsub("%%s", "(.+)")
-  pattern = pattern:gsub("%%d", "(%%d+)")
-
-  local name, roll, min, high = string.match(msg, pattern)
-
-  if name then
-    core:Show()
-    for i, player in ipairs(PORTDB.rolls) do
-      if player.name == name then
-        PORTDB.rolls[i].roll = 0
-        core:Update()
-        return
-      end
-    end
-    roll = tonumber(roll)
-    min = tonumber(min)
-    high = tonumber(high)
-    
-
-    if min == 1 and high == 100 then
-      local _, class = UnitClass(name);
-
-      local temp = {}
-      temp.name = name
-      temp.roll = roll
-      temp.class = class
-      temp.plusone = PORTDB.plusOne[name] or 0
-
-      tinsert(PORTDB.rolls, temp)
-    end
-    core:Update()
-  end
-end
-
-
-function events:CHAT_MSG_RAID_WARNING(msg, author)
-  local itemLinkPattern = "item:(%d+).+%[.+%]"
-  local plusOnePattern = "%+1$"
-  local itemID = tonumber(string.match(msg, itemLinkPattern))
-  
-
-  if string.find(msg, itemLinkpattern) then
-    local itemName, itemLink, itemRarity = GetItemInfo(itemID)
-    core.currentRollItem = itemLink
-
-    if string.find(msg, plusOnePattern) then
-      PORTDB.usePlusOne = true
-      core.addon.plusoneCB:SetChecked(true)
-      core:ClearRolls()
-      core:Show()
-
-    else
-      PORTDB.usePlusOne = false
-      core.addon.plusoneCB:SetChecked(false)
-      core:ClearRolls()
-      core:Show()
-    end
-
-  end
-end
-
-
-function events:CHAT_MSG_RAID(msg, author)
-  passPattern = "%^pass%$"
-  local _, class = UnitClass(author);
-
-  if string.find(msg, passPattern) ~= nil then
-    for i, player in ipairs(PORTDB.rolls) do
-      if player.name == author then
-        PORTDB.rolls[i].roll = 0
-        return
-      end
-    end
-
-    temp = {}
-
-    temp.roll = 0
-    temp.name = author
-    temp.class = class
-
-    tinsert(PORTDB.rolls, temp)
-  end
-end
-
-function events:LOOT_OPENED(autolootBool)
-  local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
-  
-  -- Only announce loot if loot method is masterlooter and the user of the addon is the masterlooter
-  if lootmethod == "master" and masterlooterPartyID == 0 then 
-    local guid = UnitGUID("TARGET")
-    if monstersLooted[guid] == nil then -- Havn't looted this monster before
-      monstersLooted[guid] = true
-      local lootstring = ""
-      for i = 1, GetNumLootItems() do
-        local itemLink = GetLootSlotLink(i)
-        local itemName, _, itemRarity = GetItemInfo(itemLink)
-        if itemRarity == 4 or itemRarity == 5 then
-          lootstring = lootstring..itemLink
-        end
-      end -- / forloop
-      if #lootstring > 0 then
-        SendChatMessage(lootstring ,"RAID")
-      end
-    end -- / monster not looted
-  end -- / lootmethod = master and player is masterlooter
-end
-
-
-
-
-
 ------------------------
 ----- Slash commands
 ----–––––---------------
 
 function core:SlashCommand(args)
-  local farg = select(1, args)
-  if farg == "reset" then
+  local arg1 = select(1, args)
+  local arg2 = select(2, args)
+
+  -- RESET
+  if arg1 == "reset" then
     core:ResetData()
+    core:Update()
+
+  -- STATS
+  elseif arg1 == "stats" then
+    if #PORTDB.plusOne > 0 then
+      local temp = {}
+
+      for k,v in pairs(PORTDB.plusOne) do
+        tinsert(temp, k .. "+"..v)
+      end
+      table.sort(temp)
+
+      core:Print(core.defauls.addonPrefix.." stats.")
+      for _,v in ipairs(temp) do
+        core:Print("    "..v)
+      end
+
+    else
+      core:Print(core.defaults.addonPrefix .. " no stats to show.")
+    end
+
+
+  -- CONFIG
+  elseif arg1 == "config" or arg1 == "options" or arg1 == "option" then
+    InterfaceOptionsFrame_OpenToCategory(core.optionsPanel)
+    InterfaceOptionsFrame_OpenToCategory(core.optionsPanel)
+
+  -- HELP
+  elseif arg1 == "help" then
+    core:Print(addonColor("PlusOne RollTracker").." options")
+    core:Print(addonColor("/plusone") .. " reset -- Reset addon data (Must be done at the start of each raid)")
+    core:Print(addonColor("/plusone") .. " stats -- Shows current +1 stats")
+    core:Print(addonColor("/plusone") .. " config -- Shows config panel")
+
   else
     core:Toggle()
   end
@@ -319,8 +209,9 @@ function core:CreateMenu()
     local shift_key = IsShiftKeyDown()
     local control_key = IsControlKeyDown()
 
-    if alt_key and control_key and button == "LeftButton" then
+    if alt_key and control_key and shift_key and (button == "LeftButton") then
       core:ResetData()
+      core:Update()
     else
       self:GetParent():Hide()
     end
@@ -333,6 +224,7 @@ function core:CreateMenu()
   clearBtn:SetText("Clear list")
   clearBtn:SetScript("OnClick", function(self, button)
     core:ClearRolls()
+    core:Update()
   end)
   addon.clearBtn = clearBtn
 
@@ -390,12 +282,13 @@ function core:CreateMenu()
     else
       tempFrame:SetPoint("TOP", childframes[#childframes], "BOTTOM")
     end
-    tempFrame:SetSize(scrollFrame:GetWidth(), ROLLFRAME_HEIGHT)
+    tempFrame:SetSize(scrollFrame:GetWidth(), 15)
     tempFrame:Show()
     tempFrame:SetScript("OnMouseDown", function(self, button)
-      
-      if button == "LeftButton" then
-        local name = string.match(self.name:GetText(), "%|.........(.+)%|r") -- Strip color string from name
+      local name = string.match(self.name:GetText(), "%|.........(.+)%|r") -- Strip color string from name
+
+      -- ALT + LEFT CLICK
+      if IsAltKeyDown() and (button == "LeftButton") then
 
         if PORTDB.usePlusOne then
           if PORTDB.plusOne[name] == nil then
@@ -406,18 +299,20 @@ function core:CreateMenu()
           self.plusone:SetText("+"..PORTDB.plusOne[name])
         end
 
-        
+
+
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
-  
+
         if lootmethod == "master" and masterlooterPartyID == 0 then -- PLAYER is masterlooter
           if #core.currentRollItem > 0 then -- currently rolling on an item
             for li = 1, GetNumLootItems() do -- loop through lootwindow
               if LootSlotHasItem(li) then -- current slot has item
-                lootSlotItemLink = GetLootSlotLink(li) -- get item info
-                if lootSlotItemLink == core.currentRollItem then -- loot slot item is same as current roll item
+                local lootSlotItemLink = GetLootSlotLink(li) -- get item info
+                local itemName = GetItemInfo(lootSlotItemLink)
 
-                  for ci = 1, 40 do
-                    if GetMasterLootCandidate(ci) == name then
+                if itemName == core.currentRollItem then -- loot slot item is same as current roll item
+                  for ci = 1, 40 do -- for each person in raid
+                    if GetMasterLootCandidate(li, ci) == name then
                       GiveMasterLoot(li, ci)
                       return
                     end
@@ -428,9 +323,19 @@ function core:CreateMenu()
           end
         end
 
+      -- LEFT CLICK
+      elseif button == "LeftButton" then
+        if PORTDB.usePlusOne then
+          if PORTDB.plusOne[name] == nil then
+            PORTDB.plusOne[name] = 1
+          else
+            PORTDB.plusOne[name] = PORTDB.plusOne[name]+1
+          end
+          self.plusone:SetText("+"..PORTDB.plusOne[name])
+        end
 
+      -- RIGHT CLICK
       elseif button == "RightButton" then
-        local name = self.name:GetText()
         core:IgnoreRoll(name)
         core:Update()
       end
@@ -490,9 +395,9 @@ function core:CreateMenu()
   -- ROLL FRAMES END
 
 
+
   scrollFrame:SetScrollChild(scrollChild)
-  local scrollChildren = { scrollChild:GetChildren() }
-  scrollChild:SetSize(scrollFrame:GetWidth(), ( #scrollChildren * 15 ));
+  scrollChild:SetSize(scrollFrame:GetWidth(), ( 40 * 15 ));
 
 
   addon:Hide()
@@ -500,6 +405,10 @@ function core:CreateMenu()
   core.addon = addon
   return core.addon
 end
+
+
+
+
 
 
 
@@ -513,16 +422,4 @@ core.ClassIcons = {
   PRIEST = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:128:196:64:128|t",
   WARLOCK = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:196:256:64:128|t",
   PALADIN = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:0:64:128:196|t"
-}
-
-core.ClassColors = {
-  DRUID = "FF7D0A",
-  HUNTER = "A9D271",
-  MAGE = "40C7EB",
-  PALADIN = "F58CBA",
-  PRIEST = "FFFFFF",
-  ROGUE = "FFF569",
-  SHAMAN = "0070DE",
-  WARLOCK = "8787ED",
-  WARRIOR = "C79C6E"
 }
