@@ -36,8 +36,19 @@ function core:ResetData()
   PORTDB.monstersLooted = {}
   PORTDB.plusOne = {}
   core:Print("All " .. core.defaults.addonPrefix .. " data has been reset.")
-  core:Update()
 end
+
+
+-- PRUNE MONSTERS LOOTED
+function core:PruneMonstersLooted()
+  local time = time()
+  time = (time/60)/60 -- time in hours
+
+  for k, v in pairs(PORTDB.monstersLooted) do
+    if PORTDB.monstersLooted[k]-time > 3 then PORTDB.monstersLooted[k] = nil end
+  end
+end
+
 
 
 -- CLEAR ROLLS
@@ -178,6 +189,11 @@ function core:Show()
   local menu = core.addon or core:CreateMenu()
   menu:Show()
   core:Update()
+end
+
+function core:Hide()
+  local menu = core.addon or core:CreateMenu()
+  menu:Hide()
 end
 
 -----------------------
