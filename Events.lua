@@ -117,7 +117,7 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
       core:Update()
     end
 
-  elseif string.find(string.lower(msg), rerollPattern) then
+  elseif string.find(msg:lower(), rerollPattern) then
     core:ClearRolls()
     core:Update()
   end
