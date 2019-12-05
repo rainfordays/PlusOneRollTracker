@@ -10,6 +10,7 @@ events:RegisterEvent("CHAT_MSG_SYSTEM")
 events:RegisterEvent("CHAT_MSG_RAID_WARNING")
 events:RegisterEvent("CHAT_MSG_RAID")
 events:RegisterEvent("LOOT_OPENED")
+events:RegisterEvent("PLAYER_LOGOUT")
 events:SetScript("OnEvent", function(self, event, ...)
   return self[event] and self[event](self, ...)
 end)
@@ -149,8 +150,13 @@ function events:LOOT_OPENED(autoloot)
   -- Only announce loot if loot method is masterlooter and the user of the addon is the masterlooter
   if lootmethod == "master" and masterlooterPartyID == 0 then
     local guid = UnitGUID("TARGET")
+    local time = time()
+    time = (time/60)/60 -- time in hours
+
+    if PORTDB.monstersLooted[guid]-time > 3 then PORTDB.monstersLooted[guid] = nil end
+
     if PORTDB.monstersLooted[guid] == nil then -- Havn't looted this monster before
-      PORTDB.monstersLooted[guid] = true
+      PORTDB.monstersLooted[guid] = time
       local lootstring = ""
       for li = 1, GetNumLootItems() do
         local itemLink = GetLootSlotLink(li)
@@ -185,9 +191,15 @@ function events:LOOT_OPENED(autoloot)
       end
     end -- / forloop
 
-
-
-
   end -- / lootmethod = master and player is masterlooter
 end
 
+
+function events:PLAYER_LOGOUT()
+  local time = time()
+  time = (time/60)/60 -- time in hours
+
+  for k, v in pairs(PORTDB.monstersLooted) do
+    if PORTDB.monstersLooted[k]-time > 3 then PORTDB.monstersLooted[k] = nil end
+  end
+end
