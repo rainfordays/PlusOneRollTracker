@@ -187,7 +187,7 @@ function events:LOOT_OPENED(autoloot)
 
       if PORTDB.autoloot then -- IF WE AUTOLOOT IS ENABLED
         if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
-          if not string.find(PORTDB.excludeString, itemName) then -- IF THE ITEM ISNT IN THE EXCLUDE LIST (INTERFACE OPTIONS)
+          if not string.find(PORTDB.excludeString:lower(), itemName:lower()) then -- IF THE ITEM ISNT IN THE EXCLUDE LIST (INTERFACE OPTIONS)
             if itemRarity <= PORTDB.autolootQuality then -- IF QUALITY IS LESS THAN OR EQUAL TO SET THRESHHOLD
               for ci = 1, 40 do
                 if GetMasterLootCandidate(li, ci) == UnitName("PLAYER") then
