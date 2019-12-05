@@ -162,7 +162,7 @@ function events:LOOT_OPENED(autoloot)
     local time = time()
     time = (time/60)/60 -- time in hours
 
-    if PORTDB.monstersLooted[guid]-time > 3 then PORTDB.monstersLooted[guid] = nil end
+    core:PruneMonstersLooted()
 
     if PORTDB.monstersLooted[guid] == nil then -- Havn't looted this monster before
       PORTDB.monstersLooted[guid] = time
