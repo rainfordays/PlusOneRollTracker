@@ -48,6 +48,9 @@ function events:ADDON_LOADED(name)
   core:Print(core.defaults.addonPrefix .. " by |cffFFF569Mayushi|r on |cffff0000Gehennas|r. /+1 or /plusone to open addon.")
 
   core:CreateOptionsMenu()
+  core:Hide()
+
+  core:PruneMonstersLooted()
 end
 
 
@@ -93,6 +96,7 @@ end
 function events:CHAT_MSG_RAID_WARNING(msg, author)
   local itemLinkPattern = "item:(%d+).+%[.+%]"
   local plusOnePattern = "%+1$"
+  local rerollPattern = "reroll"
   local itemID = tonumber(string.match(msg, itemLinkPattern))
 
   if string.find(msg, itemLinkPattern) then
@@ -113,7 +117,12 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
       core:Update()
     end
 
+  elseif string.find(string.lower(msg), rerollPattern) then
+    core:ClearRolls()
+    core:Update()
   end
+
+  
 end
 
 
@@ -196,10 +205,6 @@ end
 
 
 function events:PLAYER_LOGOUT()
-  local time = time()
-  time = (time/60)/60 -- time in hours
-
-  for k, v in pairs(PORTDB.monstersLooted) do
-    if PORTDB.monstersLooted[k]-time > 3 then PORTDB.monstersLooted[k] = nil end
-  end
+  core:PruneMonstersLooted()
 end
+
