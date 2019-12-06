@@ -183,7 +183,7 @@ function events:LOOT_OPENED(autoloot)
 
     for li = 1, GetNumLootItems() do
       local itemLink = GetLootSlotLink(li)
-      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemTypeID = GetItemInfo(itemLink)
+      local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
 
       if PORTDB.autoloot then -- IF WE AUTOLOOT IS ENABLED
         if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
@@ -207,4 +207,3 @@ end
 function events:PLAYER_LOGOUT()
   core:PruneMonstersLooted()
 end
-
