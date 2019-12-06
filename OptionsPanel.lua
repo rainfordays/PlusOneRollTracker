@@ -236,6 +236,3 @@ function core:CreateOptionsMenu()
   core.optionsPanel = optionsPanel
   InterfaceOptions_AddCategory(optionsPanel)
 end
-
-
-
