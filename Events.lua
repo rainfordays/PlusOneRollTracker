@@ -8,6 +8,7 @@ local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")
 events:RegisterEvent("CHAT_MSG_SYSTEM")
 events:RegisterEvent("CHAT_MSG_RAID_WARNING")
+events:RegisterEvent("CHAT_MSG_RAID_LEADER")
 events:RegisterEvent("CHAT_MSG_RAID")
 events:RegisterEvent("LOOT_OPENED")
 events:RegisterEvent("PLAYER_LOGOUT")
@@ -67,7 +68,7 @@ function events:CHAT_MSG_SYSTEM(msg)
     core:Show()
     for i, player in ipairs(PORTDB.rolls) do
       if player.name == name then
-        PORTDB.rolls[i].roll = 0
+        core:IgnoreRoll(player.name)
         core:Update()
         return
       end
@@ -84,7 +85,7 @@ function events:CHAT_MSG_SYSTEM(msg)
       temp.name = name
       temp.roll = roll
       temp.class = class
-      temp.plusone = PORTDB.plusOne[name] or 0
+      temp.plusOne = PORTDB.plusOne[name] or 0
 
       tinsert(PORTDB.rolls, temp)
     end
@@ -106,13 +107,13 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
 
     if string.find(msg, plusOnePattern) then
       PORTDB.usePlusOne = true
-      core.addon.plusoneCB:SetChecked(true)
+      core.addon.plusOneCB:SetChecked(true)
       core:ClearRolls()
       core:Update()
 
     else
       PORTDB.usePlusOne = false
-      core.addon.plusoneCB:SetChecked(false)
+      core.addon.plusOneCB:SetChecked(false)
       core:ClearRolls()
       core:Update()
     end
@@ -127,9 +128,10 @@ end
 
 
 function events:CHAT_MSG_RAID(msg, author)
-  local passPattern = "pass"
-  local _, class = UnitClass(author);
+  local passPattern = "^pass"
   local playerHasRolledBefore = false
+  author, _ = string.gsub(author, "-.*", "")
+  local _, class = UnitClass(author);
 
   if string.find(msg, passPattern) then
     for i, player in ipairs(PORTDB.rolls) do
@@ -151,6 +153,10 @@ function events:CHAT_MSG_RAID(msg, author)
 
     core:Update()
   end
+end
+
+function events:CHAT_MSG_RAID_LEADER(msg, author)
+  events:CHAT_MSG_RAID(msg, author)
 end
 
 function events:LOOT_OPENED(autoloot)
@@ -180,7 +186,7 @@ function events:LOOT_OPENED(autoloot)
     end -- / monster not looted
 
 
-    if autoloot == 1 and PORTDB.autoloot then -- AUTOLOOTING AND SETTING ENABLED
+    if autoloot == true and PORTDB.autoloot then -- AUTOLOOTING AND SETTING ENABLED
       for li = 1, GetNumLootItems() do
         local itemLink = GetLootSlotLink(li)
         local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)

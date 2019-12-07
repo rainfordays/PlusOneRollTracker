@@ -3,6 +3,9 @@ local _, core = ...
 
 core.framepool = {}
 core.currentRollItem = ""
+core.hiddenFrame = CreateFrame("Frame", nil, UIParent)
+core.hiddenFrame:Hide()
+
 
 core.defaults = {}
 core.defaults.color = "FF69B4"
@@ -19,7 +22,7 @@ local function sortRegular(a, b)
 end
 
 local function sortPlusOne(a, b)
-  return (a.plusone < b.plusone) or (a.plusone == b.plusone and a.roll > b.roll)
+  return (a.plusOne < b.plusOne) or (a.plusOne == b.plusOne and a.roll > b.roll)
 end
 
 
@@ -60,43 +63,42 @@ end
 function core:IgnoreRoll(name)
   for _, player in ipairs(PORTDB.rolls) do
     if player.name == name then
-      player.roll = 0
+      player.ignoreRoll = true
     end
   end
 end
 
 -- COLOR TEXT
 function core:colorText(text, color)
-  return "|cff".. core.colors[color] .. ""..text.."|r"
+  return "|cff".. core.colors[color] .. text.."|r"
 end
 
 core.colors = {
-  common = "ffffff",
-  uncommon = "1eff00",
-  rare = "0070dd",
-  epic = "a335ee",
-  DRUID = "FF7D0A",
-  HUNTER = "A9D271",
-  MAGE = "40C7EB",
-  PALADIN = "F58CBA",
-  PRIEST = "FFFFFF",
-  ROGUE = "FFF569",
-  SHAMAN = "0070DE",
-  WARLOCK = "8787ED",
-  WARRIOR = "C79C6E"
+  ["common"] = "ffffff",
+  ["uncommon"] = "1eff00",
+  ["rare"] = "0070dd",
+  ["epic"] = "a335ee",
+  ["DRUID"] = "FF7D0A",
+  ["HUNTER"] = "A9D271",
+  ["MAGE"] = "40C7EB",
+  ["PALADIN"] = "F58CBA",
+  ["PRIEST"] = "FFFFFF",
+  ["ROGUE"] = "FFF569",
+  ["SHAMAN"] = "0070DE",
+  ["WARLOCK"] = "8787ED",
+  ["WARRIOR"] = "C79C6E"
 }
 
 -- UPDATE
 function core:Update()
 
-  local scrollChildren = { core.addon.scrollChild:GetChildren() }
-
-  for i, frame in ipairs(scrollChildren) do
-    if frame.isHelper == false then
-      frame:Hide()
-      frame.used = false
-    end
+  for i, frame in ipairs(core.framepool) do
+    frame:SetParent(core.hiddenFrame)
+    frame.used = false
+    frame.class:SetText("")
   end
+
+
   local rolltable = PORTDB.rolls
   if PORTDB.usePlusOne then
     table.sort(rolltable, sortPlusOne)
@@ -107,24 +109,39 @@ function core:Update()
 
 
   for _, player in ipairs(PORTDB.rolls) do
-    for _, frame in ipairs(scrollChildren) do
+    for _, frame in ipairs(core.framepool) do
       if not frame.used then
         local coloredName = core:colorText(player.name, player.class)
+        frame:SetParent(core.addon.scrollChild)
         frame:SetHeight(15)
         frame.name:SetText(coloredName)
-        frame.roll:SetText(player.roll)
-        frame.plusone:SetText(PORTDB.plusOne[player.name] and "+"..PORTDB.plusOne[player.name] or "")
         frame.class:SetText(core.ClassIcons[player.class])
         frame.used = true
         frame:Show()
-        break
+        if player.ignoreRoll then
+          frame.roll:SetText(0)
+          frame.plusOne:SetText("")
+        else
+          frame.roll:SetText(player.roll)
+          if PORTDB.usePlusOne then
+            frame.plusOne:SetText(PORTDB.plusOne[player.name] and "+"..PORTDB.plusOne[player.name] or "")
+          else
+            frame.plusOne:SetText("")
+          end
+        end
+        break -- Break out of looking for an unused frame
       end
     end
   end
 
+  local numFramesActive = 0
+  for _, frame in ipairs(core.framepool) do
+    if frame.used then numFramesActive = numFramesActive+1 end
+  end
+
+  core.addon.scrollChild:SetHeight(15*numFramesActive)
+
 end
-
-
 
 
 
@@ -245,19 +262,6 @@ function core:CreateMenu()
   addon.clearBtn = clearBtn
 
 
-  --[[
-    local resetBtn = CreateFrame("Button", nil, addon, "UIPanelButtonTemplate")
-    resetBtn:SetPoint("RIGHT", clearBtn, "LEFT", -3)
-    resetBtn:SetSize(45, 30)
-    resetBtn:SetText("Reset")
-    resetBtn:SetScript("OnClick", function(self, button)
-      core:ResetData()
-    end)
-    addon.resetBtn = resetBtn
-
-  ]]
-
-
   local plusoneCB = CreateFrame("CheckButton", nil, addon, "UICheckButtonTemplate")
   plusoneCB:SetSize(30,30)
   plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 5)
@@ -266,7 +270,7 @@ function core:CreateMenu()
     core:Update()
   end)
   plusoneCB:SetChecked(PORTDB.usePlusOne)
-  addon.plusoneCB = plusoneCB
+  addon.plusOneCB = plusoneCB
 
   local cbText = plusoneCB:CreateFontString(nil, "OVERLAY")
   cbText:SetPoint("LEFT", plusoneCB, "RIGHT", 3)
@@ -286,19 +290,33 @@ function core:CreateMenu()
   --scrollChild:SetHeight(1000)
   addon.scrollChild = scrollChild
 
+  core:CreateRollFrames(addon)
 
 
-  -- ROLL FRAMES
+  scrollFrame:SetScrollChild(scrollChild)
+  scrollChild:SetWidth(scrollFrame:GetWidth());
+
+
+  addon:Hide()
+
+  core.addon = addon
+  return core.addon
+end
+
+
+function core:CreateRollFrames(addon)
+
   for i = 1, 40 do
-    local childframes = { scrollChild:GetChildren() }
+    local childframes = { core.hiddenFrame:GetChildren() }
+    local lastChild = childframes[#childframes]
 
-    local tempFrame = CreateFrame("Frame", nil, scrollChild)
-    if #childframes == 0 then
-      tempFrame:SetPoint("TOP", scrollChild, "TOP")
+    local tempFrame = CreateFrame("Frame", nil, core.hiddenFrame)
+    if i == 1 then
+      tempFrame:SetPoint("TOP", addon.scrollChild, "TOP")
     else
-      tempFrame:SetPoint("TOP", childframes[#childframes], "BOTTOM")
+      tempFrame:SetPoint("TOP", lastChild, "BOTTOM")
     end
-    tempFrame:SetSize(scrollFrame:GetWidth(), 15)
+    tempFrame:SetSize(addon.scrollFrame:GetWidth(), 15)
     tempFrame:Show()
     tempFrame:SetScript("OnMouseDown", function(self, button)
       local name = string.match(self.name:GetText(), "%|.........(.+)%|r") -- Strip color string from name
@@ -312,7 +330,7 @@ function core:CreateMenu()
           else
             PORTDB.plusOne[name] = PORTDB.plusOne[name]+1
           end
-          self.plusone:SetText("+"..PORTDB.plusOne[name])
+          self.plusOne:SetText("+"..PORTDB.plusOne[name])
         end
 
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
@@ -345,7 +363,7 @@ function core:CreateMenu()
           else
             PORTDB.plusOne[name] = PORTDB.plusOne[name]+1
           end
-          self.plusone:SetText("+"..PORTDB.plusOne[name])
+          self.plusOne:SetText("+"..PORTDB.plusOne[name])
         end
         return
       -- RIGHT CLICK
@@ -363,7 +381,7 @@ function core:CreateMenu()
       plusone:SetFontObject("GameFontNormal")
       plusone:SetPoint("LEFT", plusoneFrame, "LEFT")
       plusone:SetText("")
-      tempFrame.plusone = plusone
+      tempFrame.plusOne = plusone
 
 
 
@@ -381,7 +399,7 @@ function core:CreateMenu()
     local classFrame = CreateFrame("Frame", nil, tempFrame)
       classFrame:SetPoint("LEFT", rollFrame, "RIGHT")
       classFrame:SetSize(20, 15)
-    local class = tempFrame:CreateFontString(nil, "OVERLAY")
+    local class = classFrame:CreateFontString(nil, "OVERLAY")
       class:SetFontObject("GameFontNormal")
       class:SetPoint("LEFT", classFrame, "LEFT")
       class:SetText("")
@@ -399,25 +417,11 @@ function core:CreateMenu()
       tempFrame.name = name
 
     tempFrame.used = false
-    tempFrame.isHelper = false
     tempFrame:Hide()
 
-    addon["rollFrame"..i] = frame
+    tinsert(core.framepool, tempFrame)
 
-    tinsert(core.framepool, frame)
   end
-  -- ROLL FRAMES END
-
-
-
-  scrollFrame:SetScrollChild(scrollChild)
-  scrollChild:SetSize(scrollFrame:GetWidth(), ( 40 * 15 ));
-
-
-  addon:Hide()
-
-  core.addon = addon
-  return core.addon
 end
 
 
