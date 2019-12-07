@@ -1,6 +1,9 @@
+2.1
+- Fixed loot assignment operation
+
 2.0
--Added manual changelog and package handlers
+- Added manual changelog and package handlers
 
 1.1
--Updated autoloot logic.
-  -Now only autoloots if player uses autoloot (as well as have it enabled in addon config)
+- Updated autoloot logic.
+  - Now only autoloots if player uses autoloot (as well as have it enabled in addon config)

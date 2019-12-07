@@ -315,12 +315,10 @@ function core:CreateMenu()
           self.plusone:SetText("+"..PORTDB.plusOne[name])
         end
 
-
-
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
         if lootmethod == "master" and masterlooterPartyID == 0 then -- PLAYER is masterlooter
-          if #core.currentRollItem > 0 then -- currently rolling on an item
+          if #core.currentRollItem ~= "" then -- currently rolling on an item
             for li = 1, GetNumLootItems() do -- loop through lootwindow
               if LootSlotHasItem(li) then -- current slot has item
                 local lootSlotItemLink = GetLootSlotLink(li) -- get item info
@@ -349,7 +347,7 @@ function core:CreateMenu()
           end
           self.plusone:SetText("+"..PORTDB.plusOne[name])
         end
-
+        return
       -- RIGHT CLICK
       elseif button == "RightButton" then
         core:IgnoreRoll(name)
