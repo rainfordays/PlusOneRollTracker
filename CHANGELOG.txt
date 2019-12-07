@@ -1,3 +1,6 @@
+2.2
+- Fixed huge amount of bugs and lua errors that were introduced with last patch
+
 2.1
 - Fixed loot assignment operation
 
