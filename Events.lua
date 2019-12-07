@@ -180,12 +180,11 @@ function events:LOOT_OPENED(autoloot)
     end -- / monster not looted
 
 
+    if autoloot == 1 and PORTDB.autoloot then -- AUTOLOOTING AND SETTING ENABLED
+      for li = 1, GetNumLootItems() do
+        local itemLink = GetLootSlotLink(li)
+        local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
 
-    for li = 1, GetNumLootItems() do
-      local itemLink = GetLootSlotLink(li)
-      local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
-
-      if PORTDB.autoloot then -- IF WE AUTOLOOT IS ENABLED
         if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
           if not string.find(PORTDB.excludeString:lower(), itemName:lower()) then -- IF THE ITEM ISNT IN THE EXCLUDE LIST (INTERFACE OPTIONS)
             if itemRarity <= PORTDB.autolootQuality then -- IF QUALITY IS LESS THAN OR EQUAL TO SET THRESHHOLD
@@ -197,8 +196,8 @@ function events:LOOT_OPENED(autoloot)
             end
           end
         end
-      end
-    end -- / forloop
+      end -- / forloop
+    end
 
   end -- / lootmethod = master and player is masterlooter
 end
