@@ -95,14 +95,13 @@ end
 
 
 function events:CHAT_MSG_RAID_WARNING(msg, author)
-  local itemLinkPattern = "item:(%d+).+%[.+%]"
+  local itemLinkPattern = "item:.+%[(.+)%]"
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
-  local itemID = tonumber(string.match(msg, itemLinkPattern))
+  local itemName = string.match(msg, itemLinkPattern)
 
   if string.find(msg, itemLinkPattern) then
     core:Show()
-    local itemName, _, _ = GetItemInfo(itemID)
     core.currentRollItem = itemName
 
     if string.find(msg, plusOnePattern) then
@@ -122,8 +121,6 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
     core:ClearRolls()
     core:Update()
   end
-
-  
 end
 
 
@@ -136,7 +133,7 @@ function events:CHAT_MSG_RAID(msg, author)
   if string.find(msg, passPattern) then
     for i, player in ipairs(PORTDB.rolls) do
       if player.name == author then
-        PORTDB.rolls[i].roll = 0
+        core:IgnoreRoll(player.name)
         playerHasRolledBefore = true
       end
     end
@@ -175,9 +172,11 @@ function events:LOOT_OPENED(autoloot)
       local lootstring = ""
       for li = 1, GetNumLootItems() do
         local itemLink = GetLootSlotLink(li)
-        local _, _, itemRarity = GetItemInfo(itemLink)
-        if itemRarity == 4 or itemRarity == 5 then
-          lootstring = lootstring..itemLink
+        if itemLink ~= nil then
+          local _, _, itemRarity = GetItemInfo(itemLink)
+          if itemRarity == 4 or itemRarity == 5 then
+            lootstring = lootstring..itemLink
+          end
         end
       end -- / forloop
       if #lootstring > 0 then
@@ -189,16 +188,19 @@ function events:LOOT_OPENED(autoloot)
     if autoloot == true and PORTDB.autoloot then -- AUTOLOOTING AND SETTING ENABLED
       for li = 1, GetNumLootItems() do
         local itemLink = GetLootSlotLink(li)
-        local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
 
-        if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
-          if not string.find(PORTDB.excludeString:lower(), itemName:lower()) then -- IF THE ITEM ISNT IN THE EXCLUDE LIST (INTERFACE OPTIONS)
-            if itemRarity <= PORTDB.autolootQuality then -- IF QUALITY IS LESS THAN OR EQUAL TO SET THRESHHOLD
-              for ci = 1, 40 do
-                if GetMasterLootCandidate(li, ci) == UnitName("PLAYER") then
-                  GiveMasterLoot(li, ci)
-                end
-                end
+        if itemLink ~= nil then
+          local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
+
+          if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
+            if not string.find(PORTDB.excludeString:lower(), itemName:lower()) then -- IF THE ITEM ISNT IN THE EXCLUDE LIST (INTERFACE OPTIONS)
+              if itemRarity <= PORTDB.autolootQuality then -- IF QUALITY IS LESS THAN OR EQUAL TO SET THRESHHOLD
+                for ci = 1, 40 do
+                  if GetMasterLootCandidate(li, ci) == UnitName("PLAYER") then
+                    GiveMasterLoot(li, ci)
+                  end
+                  end
+              end
             end
           end
         end

@@ -336,20 +336,23 @@ function core:CreateRollFrames(addon)
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
         if lootmethod == "master" and masterlooterPartyID == 0 then -- PLAYER is masterlooter
-          if #core.currentRollItem ~= "" then -- currently rolling on an item
+          if core.currentRollItem ~= "" then -- currently rolling on an item
             for li = 1, GetNumLootItems() do -- loop through lootwindow
               if LootSlotHasItem(li) then -- current slot has item
                 local lootSlotItemLink = GetLootSlotLink(li) -- get item info
-                local itemName = GetItemInfo(lootSlotItemLink)
 
-                if itemName == core.currentRollItem then -- loot slot item is same as current roll item
-                  for ci = 1, 40 do -- for each person in raid
-                    if GetMasterLootCandidate(li, ci) == name then
-                      GiveMasterLoot(li, ci)
-                      return
+                if lootSlotItemLink ~= nil then
+                  local itemName = GetItemInfo(lootSlotItemLink)
+
+                  if itemName == core.currentRollItem then -- loot slot item is same as current roll item
+                    for ci = 1, 40 do -- for each person in raid
+                      if GetMasterLootCandidate(li, ci) == name then
+                        GiveMasterLoot(li, ci)
+                        return
+                      end
                     end
-                  end
-                end -- / loot slot item is same as current roll item
+                  end -- / loot slot item is same as current roll item
+                end
               end
             end -- / loop through lootwindow
           end
