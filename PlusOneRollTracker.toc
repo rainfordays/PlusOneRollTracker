@@ -1,5 +1,5 @@
 ## Interface: 11302
-## Title: |cffFF69B4PlusOneRollTracker|r
+## Title: |cffFF69B4PlusOne RollTracker|r
 ## Author: RainForDays
 ## Notes: Track rolls and +1 status in raids.
 ## Version: 2.2
