@@ -10,7 +10,7 @@ events:RegisterEvent("CHAT_MSG_SYSTEM")
 events:RegisterEvent("CHAT_MSG_RAID_WARNING")
 events:RegisterEvent("CHAT_MSG_RAID_LEADER")
 events:RegisterEvent("CHAT_MSG_RAID")
-events:RegisterEvent("LOOT_OPENED")
+events:RegisterEvent("LOOT_READY")
 events:RegisterEvent("PLAYER_LOGOUT")
 events:SetScript("OnEvent", function(self, event, ...)
   return self[event] and self[event](self, ...)
@@ -156,7 +156,7 @@ function events:CHAT_MSG_RAID_LEADER(msg, author)
   events:CHAT_MSG_RAID(msg, author)
 end
 
-function events:LOOT_OPENED(autoloot)
+function events:LOOT_READY(autoloot)
   local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
   -- Only announce loot if loot method is masterlooter and the user of the addon is the masterlooter
@@ -166,7 +166,8 @@ function events:LOOT_OPENED(autoloot)
     time = (time/60)/60 -- time in hours
 
     core:PruneMonstersLooted()
-
+    
+    -- construct string of loot links
     if PORTDB.monstersLooted[guid] == nil then -- Havn't looted this monster before
       PORTDB.monstersLooted[guid] = time
       local lootstring = ""
@@ -174,13 +175,13 @@ function events:LOOT_OPENED(autoloot)
         local itemLink = GetLootSlotLink(li)
         if itemLink ~= nil then
           local _, _, itemRarity = GetItemInfo(itemLink)
-          if itemRarity == 4 or itemRarity == 5 then
+          if itemRarity == 4 or itemRarity == 5 then -- if epic or legendary loot
             lootstring = lootstring..itemLink
           end
         end
       end -- / forloop
       if #lootstring > 0 then
-        SendChatMessage(lootstring ,"RAID")
+        SendChatMessage(lootstring ,"RAID") -- send string of loot links in raidchat
       end
     end -- / monster not looted
 
@@ -199,7 +200,7 @@ function events:LOOT_OPENED(autoloot)
                   if GetMasterLootCandidate(li, ci) == UnitName("PLAYER") then
                     GiveMasterLoot(li, ci)
                   end
-                  end
+                end
               end
             end
           end
