@@ -1,20 +1,30 @@
+2.3
+- Updated +1 assignment when using ALT click to assign loot. Will now only bump +1 when actually assigning loot.
+
+
 2.2.3
 - Updated rollframe and scrollframe
+
 
 2.2.2
 - Fixing item recognition lua errors
 
+
 2.2.1
 - Fixing lua errors
+
 
 2.2
 - Fixed huge amount of bugs and lua errors that were introduced with last patch
 
+
 2.1
 - Fixed loot assignment operation
 
+
 2.0
 - Added manual changelog and package handlers
+
 
 1.1
 - Updated autoloot logic.
