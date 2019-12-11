@@ -42,6 +42,8 @@ function core:CreateRollFrames(addon)
                         if PORTDB.usePlusOne then
                           PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
                           self.plusOne:SetText("+"..PORTDB.plusOne[name])
+                          core:ClearRolls()
+                          core:Update()
                         end
                         return
                       end
@@ -58,6 +60,8 @@ function core:CreateRollFrames(addon)
         if PORTDB.usePlusOne then
           PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
           self.plusOne:SetText("+"..PORTDB.plusOne[name])
+          core:ClearRolls()
+          core:Update()
         end
         return
       -- RIGHT CLICK
