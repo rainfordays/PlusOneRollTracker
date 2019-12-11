@@ -12,9 +12,18 @@ function core:Print(...)
 end
 
 
-
-local function addonColor(text)
+-- COLOR TEXT TO ADDON COLOR
+function core:addonColor(text)
   return "|cff"..core.defaults.color..text.."|r "
 end
 
 
+
+-- SORT FUNCTIONS
+function core.sortRegular(a, b)
+  return a.roll > b.roll
+end
+
+function core.sortPlusOne(a, b)
+  return (a.plusOne < b.plusOne) or (a.plusOne == b.plusOne and a.roll > b.roll)
+end

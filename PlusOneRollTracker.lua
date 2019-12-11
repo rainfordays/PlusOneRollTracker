@@ -31,6 +31,7 @@ function core:ClearRolls()
   PORTDB.rolls = {}
 end
 
+
 -- IGNORE ROLL
 function core:IgnoreRoll(name)
   for _, player in ipairs(PORTDB.rolls) do
@@ -38,16 +39,6 @@ function core:IgnoreRoll(name)
       player.ignoreRoll = true
     end
   end
-end
-
-
--- SORT FUNCTIONS
-local function sortRegular(a, b)
-  return a.roll > b.roll
-end
-
-local function sortPlusOne(a, b)
-  return (a.plusOne < b.plusOne) or (a.plusOne == b.plusOne and a.roll > b.roll)
 end
 
 
@@ -63,9 +54,9 @@ function core:Update()
 
   local rolltable = PORTDB.rolls
   if PORTDB.usePlusOne then
-    table.sort(rolltable, sortPlusOne)
+    table.sort(rolltable, core.sortPlusOne)
   else
-    table.sort(rolltable, sortRegular)
+    table.sort(rolltable, core.sortRegular)
   end
 
 

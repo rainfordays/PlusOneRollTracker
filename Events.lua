@@ -66,7 +66,7 @@ function events:CHAT_MSG_SYSTEM(msg)
 
   if name then
     core:Show()
-    for i, player in ipairs(PORTDB.rolls) do
+    for _, player in ipairs(PORTDB.rolls) do
       if player.name == name then
         core:IgnoreRoll(player.name)
         core:Update()

@@ -36,10 +36,10 @@ function core:SlashCommand(args)
 
   -- HELP
   elseif command == "help" then
-    core:Print(addonColor("PlusOne RollTracker").." options")
-    core:Print(addonColor("/plusone") .. " reset -- Reset addon data (Must be done at the start of each raid)")
-    core:Print(addonColor("/plusone") .. " stats -- Shows current +1 stats")
-    core:Print(addonColor("/plusone") .. " config -- Shows config panel")
+    core:Print(core:addonColor("PlusOne RollTracker").." options")
+    core:Print(core:addonColor("/plusone") .. " reset -- Reset addon data (Must be done at the start of each raid)")
+    core:Print(core:addonColor("/plusone") .. " stats -- Shows current +1 stats")
+    core:Print(core:addonColor("/plusone") .. " config -- Shows config panel")
 
   else
     core:Toggle()
