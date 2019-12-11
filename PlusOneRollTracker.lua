@@ -41,6 +41,16 @@ function core:IgnoreRoll(name)
 end
 
 
+-- SORT FUNCTIONS
+local function sortRegular(a, b)
+  return a.roll > b.roll
+end
+
+local function sortPlusOne(a, b)
+  return (a.plusOne < b.plusOne) or (a.plusOne == b.plusOne and a.roll > b.roll)
+end
+
+
 -- UPDATE
 function core:Update()
 
