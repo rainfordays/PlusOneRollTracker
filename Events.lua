@@ -1,8 +1,5 @@
 local _, core = ...
-
-----------------------------
----- EVENTS
-----------------------------
+core.loaded = false
 
 local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")
@@ -52,9 +49,11 @@ function events:ADDON_LOADED(name)
   core:Hide()
 
   core:PruneMonstersLooted()
+  core.loaded = true
 end
 
-function events:PLAYER_ENTERING_WORLD(login, reloadui) 
+function events:PLAYER_ENTERING_WORLD(login, reloadui)
+  if not core.loaded then return end
   if login or reloadui then
     core:Print(core.defaults.addonPrefix .. " by |cffFFF569Mayushi|r. /+1 or /plusone to open addon.")  
   end
