@@ -12,6 +12,7 @@ events:RegisterEvent("CHAT_MSG_RAID_LEADER")
 events:RegisterEvent("CHAT_MSG_RAID")
 events:RegisterEvent("LOOT_READY")
 events:RegisterEvent("PLAYER_LOGOUT")
+events:RegisterEvent("PALYER_ENTERING_WORLD")
 events:SetScript("OnEvent", function(self, event, ...)
   return self[event] and self[event](self, ...)
 end)
@@ -46,12 +47,17 @@ function events:ADDON_LOADED(name)
   SlashCmdList.PLUSONEROLLTRACKER = function(msg)
     core:SlashCommand(msg)
   end
-  core:Print(core.defaults.addonPrefix .. " by |cffFFF569Mayushi|r on |cffff0000Gehennas|r. /+1 or /plusone to open addon.")
 
   core:CreateOptionsMenu()
   core:Hide()
 
   core:PruneMonstersLooted()
+end
+
+function events:PLAYER_ENTERING_WORLD(login, reloadui) 
+  if login or reloadui then
+    core:Print(core.defaults.addonPrefix .. " by |cffFFF569Mayushi|r. /+1 or /plusone to open addon.")  
+  end
 end
 
 
