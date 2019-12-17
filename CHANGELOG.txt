@@ -1,3 +1,7 @@
+2.6
+- Made addon window movable
+
+
 2.5
 - Fixed various lua errors
 
