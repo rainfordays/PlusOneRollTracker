@@ -36,6 +36,8 @@ end
 function core:IgnoreRoll(name)
   for _, player in ipairs(PORTDB.rolls) do
     if player.name == name then
+      player.roll = 0
+      player.plusOne = nil
       player.ignoreRoll = true
     end
   end
@@ -45,13 +47,15 @@ end
 -- UPDATE
 function core:Update()
 
+  -- RESET ALL ROLL FRAMES
   for i, frame in ipairs(core.framepool) do
     frame:SetParent(core.hiddenFrame)
     frame.used = false
     frame.class:SetText("")
+    frame.playerName = ""
   end
 
-
+  -- SORT ROLLTABLE
   local rolltable = PORTDB.rolls
   if PORTDB.usePlusOne then
     table.sort(rolltable, core.sortPlusOne)
@@ -60,24 +64,26 @@ function core:Update()
   end
 
 
-
+  -- SET ROLLFRAMES
   for _, player in ipairs(PORTDB.rolls) do
     for _, frame in ipairs(core.framepool) do
       if not frame.used then
         local coloredName = core:colorText(player.name, player.class)
+        local pprefix = PORTDB.plusOne[player.name] and PORTDB.plusOne[player.name] > 0 and "+" or ""
         frame:SetParent(core.addon.scrollChild)
         frame:SetHeight(15)
         frame.name:SetText(coloredName)
         frame.class:SetText(core.ClassIcons[player.class])
         frame.used = true
         frame:Show()
+        frame.playerName = player.name
         if player.ignoreRoll then
           frame.roll:SetText(0)
           frame.plusOne:SetText("")
         else
           frame.roll:SetText(player.roll)
           if PORTDB.usePlusOne then
-            frame.plusOne:SetText(PORTDB.plusOne[player.name] and "+"..PORTDB.plusOne[player.name] or "")
+            frame.plusOne:SetText(PORTDB.plusOne[player.name] and pprefix ..PORTDB.plusOne[player.name] or "")
           else
             frame.plusOne:SetText("")
           end

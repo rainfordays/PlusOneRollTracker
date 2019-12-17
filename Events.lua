@@ -59,7 +59,9 @@ function events:PLAYER_ENTERING_WORLD(login, reloadui)
   end
 end
 
-
+--[[
+  ROLL
+]]
 function events:CHAT_MSG_SYSTEM(msg)
   local pattern = RANDOM_ROLL_RESULT
   pattern = pattern:gsub("%(", "%%(")
@@ -98,14 +100,26 @@ function events:CHAT_MSG_SYSTEM(msg)
   end
 end
 
-
+--[[
+  RAID WARNING
+]]
 function events:CHAT_MSG_RAID_WARNING(msg, author)
+  local itemIDPattern = "Hitem:(%d*)"
   local itemLinkPattern = "item:.+%[(.+)%]"
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
   local itemName = string.match(msg, itemLinkPattern)
 
   if string.find(msg, itemLinkPattern) then
+
+    local itemID = tonumber(string.match(msg, itemIDPattern))
+
+    itemName, itemLink, itemRarity = GetItemInfo(itemID)
+
+    if itemRarity < 2 then return end
+
+
+
     core:Show()
     core.currentRollItem = itemName
 
@@ -128,7 +142,9 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
   end
 end
 
-
+--[[
+  RAID MESSAGE
+]]
 function events:CHAT_MSG_RAID(msg, author)
   local passPattern = "^pass"
   local playerHasRolledBefore = false
@@ -146,9 +162,10 @@ function events:CHAT_MSG_RAID(msg, author)
     if not playerHasRolledBefore then
       local temp = {}
 
-      temp.roll = 0
       temp.name = author
+      temp.roll = 0
       temp.class = class
+      temp.plusOne = PORTDB.plusOne[name] or 0
 
       tinsert(PORTDB.rolls, temp)
     end
@@ -161,7 +178,13 @@ function events:CHAT_MSG_RAID_LEADER(msg, author)
   events:CHAT_MSG_RAID(msg, author)
 end
 
+
+
+--[[
+  LOOT READY
+]]
 function events:LOOT_READY(autoloot)
+  if not UnitExists("TARGET") then return end
   local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
   -- Only announce loot if loot method is masterlooter and the user of the addon is the masterlooter
@@ -171,7 +194,7 @@ function events:LOOT_READY(autoloot)
     time = (time/60)/60 -- time in hours
 
     core:PruneMonstersLooted()
-    
+
     -- construct string of loot links
     if PORTDB.monstersLooted[guid] == nil then -- Havn't looted this monster before
       PORTDB.monstersLooted[guid] = time

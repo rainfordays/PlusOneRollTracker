@@ -14,13 +14,28 @@ function core:CreateRollFrames(addon)
     end
     tempFrame:SetSize(addon.scrollFrame:GetWidth(), 15)
     tempFrame:Show()
+    tempFrame.playerName = ""
     tempFrame:SetScript("OnMouseDown", function(self, button)
-      local name = string.match(self.name:GetText(), "%|.........(.+)%|r") -- Strip color string from name
+      local name = self.playerName
+
+
+      -- SHIFT + LEFT CLICK
+      if IsShiftKeyDown() and button == "LeftButton" then
+        PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
+        if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
+        core:Update()
+        return
+
+      -- SHIFT + RIGHT CLICK
+      elseif IsShiftKeyDown() and button == "RightButton" then
+        PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]-1 or -1
+        if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
+        core:Update()
+        return
+
 
       -- ALT + LEFT CLICK
-      if IsAltKeyDown() and (button == "LeftButton") then
-
-
+      elseif (IsAltKeyDown() and (button == "LeftButton")) or button == "MiddleButton" then
 
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
@@ -37,6 +52,8 @@ function core:CreateRollFrames(addon)
                     for ci = 1, 40 do -- for each person in raid
                       if GetMasterLootCandidate(li, ci) == name then
                         GiveMasterLoot(li, ci)
+
+                        core.currentRollItem = ""
 
                         -- BUMP +1
                         if PORTDB.usePlusOne then
@@ -55,15 +72,6 @@ function core:CreateRollFrames(addon)
           end
         end
 
-      -- LEFT CLICK
-      elseif button == "LeftButton" then
-        if PORTDB.usePlusOne then
-          PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
-          self.plusOne:SetText("+"..PORTDB.plusOne[name])
-          core:ClearRolls()
-          core:Update()
-        end
-        return
       -- RIGHT CLICK
       elseif button == "RightButton" then
         core:IgnoreRoll(name)
