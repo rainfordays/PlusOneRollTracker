@@ -26,22 +26,13 @@ function core:CreateMenu()
   closeBtn:SetSize(32,32)
   closeBtn:SetPoint("TOPRIGHT", addon, "TOPRIGHT", 1, 1)
   closeBtn:SetScript("OnClick", function(self, button)
-    local alt_key = IsAltKeyDown()
-    local shift_key = IsShiftKeyDown()
-    local control_key = IsControlKeyDown()
-
-    if alt_key and control_key and shift_key and (button == "LeftButton") then
-      core:ResetData()
-      core:Update()
-    else
-      self:GetParent():Hide()
-    end
+    self:GetParent():Hide()
   end)
   addon.closeBtn = closeBtn
 
   local clearBtn = CreateFrame("Button", nil, addon, "UIPanelButtonTemplate")
   clearBtn:SetPoint("BOTTOMRIGHT", addon, "BOTTOMRIGHT", -5, 5)
-  clearBtn:SetSize(60, 30)
+  clearBtn:SetSize(60, 25)
   clearBtn:SetText("Clear list")
   clearBtn:SetScript("OnClick", function(self, button)
     core:ClearRolls()
@@ -50,10 +41,21 @@ function core:CreateMenu()
   addon.clearBtn = clearBtn
 
 
+  local resetBtn = CreateFrame("Button", nil, addon, "UIPanelButtonTemplate")
+  resetBtn:SetPoint("TOPRIGHT", clearBtn, "TOPLEFT", 0, 0)
+  resetBtn:SetSize(55, 25)
+  resetBtn:SetText("Reset +1")
+  resetBtn:SetScript("OnClick", function(self, button)
+    core:ResetData()
+    core:Update()
+  end)
+  addon.resetBtn = resetBtn
+
+
   local plusoneCB = CreateFrame("CheckButton", nil, addon, "UICheckButtonTemplate")
   plusoneCB:SetSize(30,30)
-  plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 5)
-  plusoneCB:SetScript("OnClick", function(self, button) 
+  plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 2)
+  plusoneCB:SetScript("OnClick", function(self, button)
     PORTDB.usePlusOne = self:GetChecked()
     core:Update()
   end)

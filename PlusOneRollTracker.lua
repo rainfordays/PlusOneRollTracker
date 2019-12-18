@@ -9,7 +9,6 @@ core.hiddenFrame:Hide()
 -- RESET DATA
 function core:ResetData()
   PORTDB.rolls = {}
-  PORTDB.monstersLooted = {}
   PORTDB.plusOne = {}
   core:Print("All " .. core.defaults.addonPrefix .. " data has been reset.")
 end
