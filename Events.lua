@@ -1,5 +1,7 @@
 local _, core = ...
 core.loaded = false
+core.itemWaitTable = {}
+
 
 local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")
@@ -10,6 +12,7 @@ events:RegisterEvent("CHAT_MSG_RAID")
 events:RegisterEvent("LOOT_READY")
 events:RegisterEvent("PLAYER_LOGOUT")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
+events:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 events:SetScript("OnEvent", function(self, event, ...)
   return self[event] and self[event](self, ...)
 end)
@@ -55,7 +58,7 @@ end
 function events:PLAYER_ENTERING_WORLD(login, reloadui)
   if not core.loaded then return end
   if login or reloadui then
-    core:Print(core.defaults.addonPrefix .. " by |cffFFF569Mayushi|r. /+1 or /plusone to open addon.")  
+    core:Print(core.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")  
   end
 end
 
@@ -69,9 +72,13 @@ function events:CHAT_MSG_SYSTEM(msg)
   pattern = pattern:gsub("%%s", "(.+)")
   pattern = pattern:gsub("%%d", "(%%d+)")
 
-  local name, roll, min, high = string.match(msg, pattern)
+  local name, roll, min, max = string.match(msg, pattern)
 
-  if name then
+  roll = tonumber(roll)
+  min = tonumber(min)
+  max = tonumber(max)
+
+  if min == 1 and max == 100 then
     core:Show()
     for _, player in ipairs(PORTDB.rolls) do
       if player.name == name then
@@ -81,21 +88,15 @@ function events:CHAT_MSG_SYSTEM(msg)
       end
     end
 
-    roll = tonumber(roll)
-    min = tonumber(min)
-    high = tonumber(high)
+    local _, class = UnitClass(name);
 
-    if min == 1 and high == 100 then
-      local _, class = UnitClass(name);
+    local temp = {}
+    temp.name = name
+    temp.roll = roll
+    temp.class = class
+    temp.plusOne = PORTDB.plusOne[name] or 0
 
-      local temp = {}
-      temp.name = name
-      temp.roll = roll
-      temp.class = class
-      temp.plusOne = PORTDB.plusOne[name] or 0
-
-      tinsert(PORTDB.rolls, temp)
-    end
+    tinsert(PORTDB.rolls, temp)
     core:Update()
   end
 end
@@ -108,13 +109,16 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
   local itemLinkPattern = "item:.+%[(.+)%]"
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
-  local itemName = string.match(msg, itemLinkPattern)
 
   if string.find(msg, itemLinkPattern) then
 
     local itemID = tonumber(string.match(msg, itemIDPattern))
 
-    itemName, itemLink, itemRarity = GetItemInfo(itemID)
+    local itemName, itemLink, itemRarity = GetItemInfo(itemID)
+
+    if not itemName then
+      core.itemWaitTable[itemID] = {msg = msg, author = author}
+    end
 
     if itemRarity < 2 then return end
 
@@ -147,12 +151,16 @@ end
 ]]
 function events:CHAT_MSG_RAID(msg, author)
   local passPattern = "^pass"
-  local playerHasRolledBefore = false
-  author, _ = string.gsub(author, "-.*", "")
-  local _, class = UnitClass(author);
 
   if string.find(msg, passPattern) then
-    for i, player in ipairs(PORTDB.rolls) do
+    local playerHasRolledBefore = false
+    local name = author
+    if string.find(name, "-") then 
+      name = string.gsub(author, "-.*", "")
+    end
+    local _, class = UnitClass(name);
+
+    for _, player in ipairs(PORTDB.rolls) do
       if player.name == author then
         core:IgnoreRoll(player.name)
         playerHasRolledBefore = true
@@ -162,7 +170,7 @@ function events:CHAT_MSG_RAID(msg, author)
     if not playerHasRolledBefore then
       local temp = {}
 
-      temp.name = author
+      temp.name = name
       temp.roll = 0
       temp.class = class
       temp.plusOne = PORTDB.plusOne[name] or 0
@@ -242,4 +250,14 @@ end
 
 function events:PLAYER_LOGOUT()
   core:PruneMonstersLooted()
+end
+
+
+
+function events:GET_ITEM_INFO_RECEIVED(itemID, success)
+  if success == nil then return end
+  if core.itemWaitTable[itemID] then
+    events:CHAT_MSG_RAID_WARNING(core.itemWaitTable.msg, core.itemWaitTable.author)
+    core.itemWaitTable[itemID] = nil
+  end
 end

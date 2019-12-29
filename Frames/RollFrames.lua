@@ -53,15 +53,14 @@ function core:CreateRollFrames(addon)
                       if GetMasterLootCandidate(li, ci) == name then
                         GiveMasterLoot(li, ci)
 
-                        core.currentRollItem = ""
 
                         -- BUMP +1
                         if PORTDB.usePlusOne then
                           PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
                           self.plusOne:SetText("+"..PORTDB.plusOne[name])
-                          core:ClearRolls()
                           core:Update()
                         end
+                        core.currentRollItem = ""
                         return
                       end
                     end

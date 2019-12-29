@@ -1,8 +1,8 @@
 local _, core = ...
 
-
 function core:SlashCommand(args)
   local command, rest = strsplit(" ", args, 2)
+  local PORTDB = PlusOneRollTrackerDB
 
   -- RESET
   if command == "reset" then
@@ -11,19 +11,18 @@ function core:SlashCommand(args)
 
   -- STATS
   elseif command == "stats" then
-    if #PORTDB.plusOne > 0 then
-      local temp = {}
+    local temp = {}
 
-      for k,v in pairs(PORTDB.plusOne) do
-        tinsert(temp, k .. "+"..v)
-      end
-      table.sort(temp)
+    for k,v in pairs(PORTDB.plusOne) do
+      tinsert(temp, k .. "+"..v)
+    end
+    table.sort(temp)
 
-      core:Print(core.defauls.addonPrefix.." stats.")
+    if #temp > 0 then
+      core:Print(core.defaults.addonPrefix.." stats.")
       for _,v in ipairs(temp) do
         core:Print("    "..v)
       end
-
     else
       core:Print(core.defaults.addonPrefix .. " no stats to show.")
     end

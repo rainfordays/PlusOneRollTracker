@@ -4,7 +4,7 @@
 ## Notes: Track rolls and +1 status in raids.
 ## Version: 2.7
 ## DefaultState: enabled
-## SavedVariablesPerCharacter: PlusOneRollTrackerDB
+## SavedVariablesPerCharacter: PORTDB
 
 Frames\MainFrame.lua
 Frames\RollFrames.lua
