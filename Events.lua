@@ -118,6 +118,7 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
 
     if not itemName then
       core.itemWaitTable[itemID] = {msg = msg, author = author}
+      return
     end
 
     if itemRarity < 2 then return end
@@ -155,7 +156,7 @@ function events:CHAT_MSG_RAID(msg, author)
   if string.find(msg, passPattern) then
     local playerHasRolledBefore = false
     local name = author
-    if string.find(name, "-") then 
+    if string.find(name, "-") then
       name = string.gsub(author, "-.*", "")
     end
     local _, class = UnitClass(name);
