@@ -15,6 +15,9 @@ function core:CreateMenu()
   addon:RegisterForDrag("LeftButton")
   addon:SetScript("OnDragStart", addon.StartMoving)
   addon:SetScript("OnDragStop", addon.StopMovingOrSizing)
+  addon:SetScript("OnHide", function(self)
+    core:ClearRolls()
+  end)
 
   local title = addon:CreateFontString(nil, "OVERLAY")
   title:SetPoint("TOPLEFT", addon, "TOPLEFT", 10, -10)
@@ -26,7 +29,7 @@ function core:CreateMenu()
   closeBtn:SetSize(32,32)
   closeBtn:SetPoint("TOPRIGHT", addon, "TOPRIGHT", 1, 1)
   closeBtn:SetScript("OnClick", function(self, button)
-    core:ClearRolls()
+
     self:GetParent():Hide()
   end)
   addon.closeBtn = closeBtn
