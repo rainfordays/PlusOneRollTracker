@@ -58,7 +58,7 @@ end
 function events:PLAYER_ENTERING_WORLD(login, reloadui)
   if not core.loaded then return end
   if login or reloadui then
-    core:Print(core.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")  
+    core:Print(core.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")
   end
 end
 
