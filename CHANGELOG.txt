@@ -1,3 +1,7 @@
+2.8
+- Now clears current rolls when window is closed.
+
+
 2.7
 - Added "clear +1" button
 
