@@ -3,7 +3,7 @@
 
 
 2.7
-- Added "clear +1" button
+- Added "clear +1" button to reset all +1 stats
 
 
 2.6
