@@ -2,6 +2,8 @@ local _, core = ...
 core.loaded = false
 core.itemWaitTable = {}
 
+local tempRollTable = {}
+
 
 local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")
@@ -9,6 +11,7 @@ events:RegisterEvent("CHAT_MSG_SYSTEM")
 events:RegisterEvent("CHAT_MSG_RAID_WARNING")
 events:RegisterEvent("CHAT_MSG_RAID_LEADER")
 events:RegisterEvent("CHAT_MSG_RAID")
+events:RegisterEvent("CHAT_MSG_PARTY")
 events:RegisterEvent("LOOT_READY")
 events:RegisterEvent("PLAYER_LOGOUT")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -169,14 +172,14 @@ function events:CHAT_MSG_RAID(msg, author)
     end
 
     if not playerHasRolledBefore then
-      local temp = {}
+      wipe(tempRollTable)
 
-      temp.name = name
-      temp.roll = 0
-      temp.class = class
-      temp.plusOne = PORTDB.plusOne[name] or 0
+      tempRollTable.name = name
+      tempRollTable.roll = 0
+      tempRollTable.class = class
+      tempRollTable.plusOne = PORTDB.plusOne[name] or 0
 
-      tinsert(PORTDB.rolls, temp)
+      tinsert(PORTDB.rolls, tempRollTable)
     end
 
     core:Update()
@@ -184,6 +187,10 @@ function events:CHAT_MSG_RAID(msg, author)
 end
 
 function events:CHAT_MSG_RAID_LEADER(msg, author)
+  events:CHAT_MSG_RAID(msg, author)
+end
+
+function events:CHAT_MSG_PARTY(msg, author)
   events:CHAT_MSG_RAID(msg, author)
 end
 

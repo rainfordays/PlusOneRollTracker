@@ -8,8 +8,8 @@ core.hiddenFrame:Hide()
 
 -- RESET DATA
 function core:ResetData()
-  PORTDB.rolls = {}
-  PORTDB.plusOne = {}
+  wipe(PORTDB.rolls)
+  wipe(PORTDB.plusOne)
   core:Print("All " .. core.defaults.addonPrefix .. " data has been reset.")
 end
 
@@ -19,7 +19,7 @@ function core:PruneMonstersLooted()
   local time = time()
   time = (time/60)/60 -- time in hours
 
-  for k, v in pairs(PORTDB.monstersLooted) do
+  for k, _ in pairs(PORTDB.monstersLooted) do
     if PORTDB.monstersLooted[k]-time > 3 then PORTDB.monstersLooted[k] = nil end
   end
 end
@@ -27,7 +27,7 @@ end
 
 -- CLEAR ROLLS
 function core:ClearRolls()
-  PORTDB.rolls = {}
+  wipe(PORTDB.rolls)
 end
 
 
