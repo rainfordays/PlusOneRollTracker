@@ -108,12 +108,14 @@ end
   RAID WARNING
 ]]
 function events:CHAT_MSG_RAID_WARNING(msg, author)
-  local itemIDPattern = "Hitem:(%d*)"
+  if string.find(msg, "awarded") then return end
+
+  local itemIDPattern = "^|c........|Hitem:(%d*)"
   local itemLinkPattern = "item:.+%[(.+)%]"
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
 
-  if string.find(msg, itemLinkPattern) then
+  if string.find(msg, itemLinkPattern)  then
 
     local itemID = tonumber(string.match(msg, itemIDPattern))
 
