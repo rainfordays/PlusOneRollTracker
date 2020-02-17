@@ -115,7 +115,7 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
 
-  if string.find(msg, itemLinkPattern)  then
+  if string.find(msg, itemIDPattern)  then
 
     local itemID = tonumber(string.match(msg, itemIDPattern))
 
