@@ -7,6 +7,11 @@ core.defaults.addonPrefix = "|cff".. core.defaults.color .."PlusOne RollTracker|
 core.currentRollItem = ""
 
 
+core.ignoredItems = {
+  ["Onyxia Scale Cloak"]
+}
+
+
 core.colors = {
   ["common"] = "ffffff",
   ["uncommon"] = "1eff00",

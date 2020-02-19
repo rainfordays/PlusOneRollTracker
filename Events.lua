@@ -110,6 +110,10 @@ end
 function events:CHAT_MSG_RAID_WARNING(msg, author)
   if string.find(msg, "awarded") then return end
 
+  -- Dont start new roll on raidwarning with multiple items
+  local _, numItemsInRW = output:gsub("item:", '')
+  if numItemsInRW > 1 then return end
+
   local itemIDPattern = "^|c........|Hitem:(%d*)"
   local itemLinkPattern = "item:.+%[(.+)%]"
   local plusOnePattern = "%+1$"
@@ -127,6 +131,7 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
     end
 
     if itemRarity < 2 then return end
+    if core.ignoredItems[itemName] then return end
 
 
 
