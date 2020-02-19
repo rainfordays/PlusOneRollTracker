@@ -1,6 +1,13 @@
+3.0
+- Added countdown with slashcommand "/+1 cd 5"
+  - Change 5 to whatever number of seconds you want.
+  - Will post to RW chat when less than 10 seconds remain on the countdown.
+
+
 2.8.2
 - Ignores raid warnings with onyxia scale cloak.
 - Ignores raid warnings containing multiple items.
+
 
 2.8
 - Now clears current rolls when window is closed.

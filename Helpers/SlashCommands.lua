@@ -1,4 +1,10 @@
 local _, core = ...
+core.countDownNum = 0
+
+function core.countDown()
+  SendChatMessage(core.countDownNum, "RAID_WARNING")
+  core.countDownNum = core.countDownNum-1
+end
 
 function core:SlashCommand(args)
   local command, rest = strsplit(" ", args, 2)
@@ -8,6 +14,21 @@ function core:SlashCommand(args)
   if command == "reset" then
     core:ResetData()
     core:Update()
+
+  -- COUNTDOWN
+  elseif command == "countdown" or command == "count" or command == "cd" then
+    local seconds, rest = strsplit(" ", rest, 2)
+    core.countDownNum = tonumber(seconds)
+
+    C_Timer.NewTicker(1,
+      function()
+        if core.countDownNum < 11 then
+          SendChatMessage(core.countDownNum, "RAID_WARNING")
+        end
+        core.countDownNum = core.countDownNum-1
+      end,
+    seconds)
+
 
   -- STATS
   elseif command == "stats" then
