@@ -8,7 +8,8 @@ core.currentRollItem = ""
 
 
 core.ignoredItems = {
-  "Onyxia Scale Cloak"
+  "Onyxia Scale Cloak",
+  "Drakefire Amulet"
 }
 
 

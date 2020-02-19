@@ -108,18 +108,18 @@ end
   RAID WARNING
 ]]
 function events:CHAT_MSG_RAID_WARNING(msg, author)
-  if string.find(msg, "awarded") then return end
-  if not string.find(msg, "item:") then return end
 
-  local _, numItemsInRW = output:gsub("Hitem:", '')
-  -- Dont start new roll on raidwarning with multiple items
-  if numItemsInRW > 1 then return end
-  
   local itemIDPattern = "^|c........|Hitem:(%d*)"
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
-  
+
   if string.find(msg, itemIDPattern)  then
+    if string.find(msg, "awarded") then return end
+    if not string.find(msg, "item:") then return end
+
+    -- Dont start new roll on raidwarning with multiple items
+    local _, numItemsInRW = output:gsub("Hitem:", '')
+    if numItemsInRW > 1 then return end
 
     local itemID = tonumber(string.match(msg, itemIDPattern))
 
