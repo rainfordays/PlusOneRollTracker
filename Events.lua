@@ -113,16 +113,12 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
 
-  if string.find(msg, itemIDPattern)  then
+  if string.find(msg, itemIDPattern) then
     if string.find(msg, "awarded") then return end
-    if not string.find(msg, "item:") then return end
-
     -- Dont start new roll on raidwarning with multiple items
-    local _, numItemsInRW = output:gsub("Hitem:", '')
-    if numItemsInRW > 1 then return end
+    if select(2, string.gsub(msg, "Hitem:", '')) > 1 then return end
 
     local itemID = tonumber(string.match(msg, itemIDPattern))
-
     local itemName, itemLink, itemRarity = GetItemInfo(itemID)
 
     if not itemName then
@@ -134,21 +130,15 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
     if core.ignoredItems[itemName] then return end
 
 
-
     core:Show()
     core.currentRollItem = itemName
+    core:ClearRolls()
+    core:Update()
 
     if string.find(msg, plusOnePattern) then
-      PORTDB.usePlusOne = true
-      core.addon.plusOneCB:SetChecked(true)
-      core:ClearRolls()
-      core:Update()
-
+      core:IsPlusOneRoll()
     else
-      PORTDB.usePlusOne = false
-      core.addon.plusOneCB:SetChecked(false)
-      core:ClearRolls()
-      core:Update()
+      core:NotPlusOneRoll()
     end
 
   elseif string.find(msg:lower(), rerollPattern) then
@@ -161,33 +151,29 @@ end
   RAID MESSAGE
 ]]
 function events:CHAT_MSG_RAID(msg, author)
-  local passPattern = "^pass"
+  local passPattern = "pass"
+  local name = string.gsub(author, "%-.*", "")
+  local server = string.gsub(author, ".-%-", "")
+  local _, class = UnitClass(name);
 
   if string.find(msg, passPattern) then
-    local playerHasRolledBefore = false
-    local name = author
-    if string.find(name, "-") then
-      name = string.gsub(author, "-.*", "")
-    end
-    local _, class = UnitClass(name);
-
+    -- CHECK IF THEY HAVE ROLLED BEFORE AND IF THEY DID THEN IGNORE THEIR ROLL
     for _, player in ipairs(PORTDB.rolls) do
-      if player.name == author then
+      if player.name == name then
         core:IgnoreRoll(player.name)
-        playerHasRolledBefore = true
+        return core:Update()
       end
     end
 
-    if not playerHasRolledBefore then
-      wipe(tempRollTable)
+    -- WILL ONLY GET HERE IF PLAYER HASNT ROLLED BEFORE
+    wipe(tempRollTable)
 
-      tempRollTable.name = name
-      tempRollTable.roll = 0
-      tempRollTable.class = class
-      tempRollTable.plusOne = PORTDB.plusOne[name] or 0
+    tempRollTable.name = name
+    tempRollTable.roll = 0
+    tempRollTable.class = class
+    tempRollTable.plusOne = PORTDB.plusOne[name] or 0
 
-      tinsert(PORTDB.rolls, tempRollTable)
-    end
+    tinsert(PORTDB.rolls, tempRollTable)
 
     core:Update()
   end

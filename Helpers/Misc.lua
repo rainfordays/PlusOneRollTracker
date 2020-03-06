@@ -27,3 +27,28 @@ end
 function core.sortPlusOne(a, b)
   return (a.plusOne < b.plusOne) or (a.plusOne == b.plusOne and a.roll > b.roll)
 end
+
+
+
+-- USE PLUSONE
+function core:IsPlusOneRoll()
+  PORTDB.usePlusOne = true
+  core.addon.plusOneCB:SetChecked(true)
+end
+
+-- REGULAR ROLL
+function core:NotPlusOneRoll()
+  PORTDB.usePlusOne = false
+  core.addon.plusOneCB:SetChecked(false)
+end
+
+
+
+-- GET NON USED FRAME FOR ROLLS
+function core:GetRollFrame()
+  for _, frame in ipairs(core.framepool) do
+    if not frame.used then
+      return frame
+    end
+  end
+end

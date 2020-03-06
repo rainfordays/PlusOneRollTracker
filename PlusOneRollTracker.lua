@@ -38,6 +38,7 @@ function core:IgnoreRoll(name)
       player.roll = 0
       player.plusOne = nil
       player.ignoreRoll = true
+      return
     end
   end
 end
@@ -65,29 +66,26 @@ function core:Update()
 
   -- SET ROLLFRAMES
   for _, player in ipairs(PORTDB.rolls) do
-    for _, frame in ipairs(core.framepool) do
-      if not frame.used then
-        local coloredName = core:colorText(player.name, player.class)
-        local pprefix = PORTDB.plusOne[player.name] and PORTDB.plusOne[player.name] > 0 and "+" or ""
-        frame:SetParent(core.addon.scrollChild)
-        frame:SetHeight(15)
-        frame.name:SetText(coloredName)
-        frame.class:SetText(core.ClassIcons[player.class])
-        frame.used = true
-        frame:Show()
-        frame.playerName = player.name
-        if player.ignoreRoll then
-          frame.roll:SetText(0)
-          frame.plusOne:SetText("")
-        else
-          frame.roll:SetText(player.roll)
-          if PORTDB.usePlusOne then
-            frame.plusOne:SetText(PORTDB.plusOne[player.name] and pprefix ..PORTDB.plusOne[player.name] or "")
-          else
-            frame.plusOne:SetText("")
-          end
-        end
-        break -- Break out of looking for an unused frame
+    local frame = core:GetRollFrame()
+
+    local coloredName = core:colorText(player.name, player.class)
+    local pprefix = PORTDB.plusOne[player.name] and PORTDB.plusOne[player.name] > 0 and "+" or ""
+    frame:SetParent(core.addon.scrollChild)
+    frame:SetHeight(15)
+    frame.name:SetText(coloredName)
+    frame.class:SetText(core.ClassIcons[player.class])
+    frame.used = true
+    frame:Show()
+    frame.playerName = player.name
+    if player.ignoreRoll then
+      frame.roll:SetText(0)
+      frame.plusOne:SetText("")
+    else
+      frame.roll:SetText(player.roll)
+      if PORTDB.usePlusOne then
+        frame.plusOne:SetText(PORTDB.plusOne[player.name] and pprefix ..PORTDB.plusOne[player.name] or "")
+      else
+        frame.plusOne:SetText("")
       end
     end
   end
@@ -100,6 +98,3 @@ function core:Update()
   core.addon.scrollChild:SetHeight(15*numFramesActive)
 
 end
-
-
-
