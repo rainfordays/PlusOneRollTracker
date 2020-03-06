@@ -35,7 +35,7 @@ function events:ADDON_LOADED(name)
   if not PORTDB.autolootQuality then PORTDB.autolootQuality = 3 end
   if not PORTDB.autoloot then PORTDB.autoloot = false end
   if not PORTDB.excludeItemType then PORTDB.excludeItemType = {} end
-  if not PORTDB.excludeString then PORTDB.excludeString = "Onyxia Hide Backpack\nHead of Onyxia" end
+  if not PORTDB.excludeString then PORTDB.excludeString = "Onyxia Hide Backpack\nHead of Onyxia\nHead of Nefarian" end
 
   local f=InterfaceOptionsFrame
   f:SetMovable(true)
