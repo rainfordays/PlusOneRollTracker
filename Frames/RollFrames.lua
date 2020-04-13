@@ -1,12 +1,12 @@
-local _, core = ...
+local _, A = ...
 
-function core:CreateRollFrames(addon)
+function A:CreateRollFrames(addon)
 
   for i = 1, 40 do
-    local childframes = { core.hiddenFrame:GetChildren() }
+    local childframes = { A.hiddenFrame:GetChildren() }
     local lastChild = childframes[#childframes]
 
-    local tempFrame = CreateFrame("Frame", nil, core.hiddenFrame)
+    local tempFrame = CreateFrame("Frame", nil, A.hiddenFrame)
     if i == 1 then
       tempFrame:SetPoint("TOP", addon.scrollChild, "TOP")
     else
@@ -23,14 +23,14 @@ function core:CreateRollFrames(addon)
       if IsShiftKeyDown() and button == "LeftButton" then
         PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
         if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
-        core:Update()
+        A:Update()
         return
 
       -- SHIFT + RIGHT CLICK
       elseif IsShiftKeyDown() and button == "RightButton" then
         PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]-1 or -1
         if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
-        core:Update()
+        A:Update()
         return
 
 
@@ -40,7 +40,7 @@ function core:CreateRollFrames(addon)
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
         if lootmethod == "master" and masterlooterPartyID == 0 then -- PLAYER is masterlooter
-          if core.currentRollItem ~= "" then -- currently rolling on an item
+          if A.currentRollItem ~= "" then -- currently rolling on an item
             for li = 1, GetNumLootItems() do -- loop through lootwindow
               if LootSlotHasItem(li) then -- current slot has item
                 local lootSlotItemLink = GetLootSlotLink(li) -- get item info
@@ -48,7 +48,7 @@ function core:CreateRollFrames(addon)
                 if lootSlotItemLink ~= nil then
                   local itemName = GetItemInfo(lootSlotItemLink)
 
-                  if itemName == core.currentRollItem then -- loot slot item is same as current roll item
+                  if itemName == A.currentRollItem then -- loot slot item is same as current roll item
                     for ci = 1, 40 do -- for each person in raid
                       if GetMasterLootCandidate(li, ci) == name then
                         GiveMasterLoot(li, ci)
@@ -58,9 +58,9 @@ function core:CreateRollFrames(addon)
                         if PORTDB.usePlusOne then
                           PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
                           self.plusOne:SetText("+"..PORTDB.plusOne[name])
-                          core:Update()
+                          A:Update()
                         end
-                        core.currentRollItem = ""
+                        A.currentRollItem = ""
                         return
                       end
                     end
@@ -73,8 +73,8 @@ function core:CreateRollFrames(addon)
 
       -- RIGHT CLICK
       elseif button == "RightButton" then
-        core:IgnoreRoll(name)
-        core:Update()
+        A:IgnoreRoll(name)
+        A:Update()
       end
     end)
 
@@ -124,7 +124,7 @@ function core:CreateRollFrames(addon)
     tempFrame.used = false
     tempFrame:Hide()
 
-    tinsert(core.framepool, tempFrame)
+    tinsert(A.framepool, tempFrame)
 
   end
 end

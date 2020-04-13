@@ -1,4 +1,4 @@
-local _, core = ...
+local _, A = ...
 
 
 local itemTypeIDs = {
@@ -21,7 +21,7 @@ local itemTypeIDs = {
 
 
 -- INTERFACE OPTIONS PANEL
-function core:CreateOptionsMenu()
+function A:CreateOptionsMenu()
   local optionsPanel = CreateFrame("Frame", "PlusOneRollTrackerOptions", UIParent)
   optionsPanel.name = "PlusOne RollTracker"
 
@@ -84,7 +84,7 @@ function core:CreateOptionsMenu()
   local commonQualityText = optionsPanel:CreateFontString(nil, "OVERLAY")
   commonQualityText:SetPoint("LEFT", commonQualityCB, "RIGHT", 3, 0)
   commonQualityText:SetFontObject("GameFontNormal")
-  commonQualityText:SetText(core:colorText(ITEM_QUALITY1_DESC, "common"))
+  commonQualityText:SetText(A:colorText(ITEM_QUALITY1_DESC, "common"))
   optionsPanel.commonQualityText = commonQualityText
 
 
@@ -111,7 +111,7 @@ function core:CreateOptionsMenu()
   local uncommonQualityText = optionsPanel:CreateFontString(nil, "OVERLAY")
   uncommonQualityText:SetPoint("LEFT", uncommonQualityCB, "RIGHT", 3, 0)
   uncommonQualityText:SetFontObject("GameFontNormal")
-  uncommonQualityText:SetText(core:colorText(ITEM_QUALITY2_DESC, "uncommon"))
+  uncommonQualityText:SetText(A:colorText(ITEM_QUALITY2_DESC, "uncommon"))
   optionsPanel.uncommonQualityText = uncommonQualityText
 
 
@@ -138,7 +138,7 @@ function core:CreateOptionsMenu()
   local rareQualityText = optionsPanel:CreateFontString(nil, "OVERLAY")
   rareQualityText:SetPoint("LEFT", rareQualityCB, "RIGHT", 3, 0)
   rareQualityText:SetFontObject("GameFontNormal")
-  rareQualityText:SetText(core:colorText(ITEM_QUALITY3_DESC, "rare"))  optionsPanel.rareQualityText = rareQualityText
+  rareQualityText:SetText(A:colorText(ITEM_QUALITY3_DESC, "rare"))  optionsPanel.rareQualityText = rareQualityText
 
 
   local recipeCB = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
@@ -233,6 +233,6 @@ function core:CreateOptionsMenu()
 
 
 
-  core.optionsPanel = optionsPanel
+  A.optionsPanel = optionsPanel
   InterfaceOptions_AddCategory(optionsPanel)
 end

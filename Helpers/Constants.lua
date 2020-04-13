@@ -1,19 +1,19 @@
-local _, core = ...
+local _, A = ...
 
-core.defaults = {}
-core.defaults.color = "FF69B4"
-core.defaults.addonPrefix = "|cff".. core.defaults.color .."PlusOne RollTracker|r"
+A.defaults = {}
+A.defaults.color = "FF69B4"
+A.defaults.addonPrefix = "|cff".. A.defaults.color .."PlusOne RollTracker|r"
 
-core.currentRollItem = ""
+A.currentRollItem = ""
 
 
-core.ignoredItems = {
+A.ignoredItems = {
   "Onyxia Scale Cloak",
   "Drakefire Amulet"
 }
 
 
-core.colors = {
+A.colors = {
   ["common"] = "ffffff",
   ["uncommon"] = "1eff00",
   ["rare"] = "0070dd",
@@ -30,7 +30,7 @@ core.colors = {
 }
 
 
-core.ClassIcons = {
+A.ClassIcons = {
   WARRIOR = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:0:64:0:64|t",
   MAGE = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:64:128:0:64|t",
   ROGUE = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:128:196:0:64|t",
@@ -42,4 +42,4 @@ core.ClassIcons = {
   PALADIN = "|TInterface\\WorldStateFrame\\ICONS-CLASSES:15:15:0:0:256:256:0:64:128:196|t"
 }
 
-return core
+return A

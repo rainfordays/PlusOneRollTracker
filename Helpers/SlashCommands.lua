@@ -1,31 +1,31 @@
-local _, core = ...
-core.countDownNum = 0
+local _, A = ...
+A.countDownNum = 0
 
-function core.countDown()
-  SendChatMessage(core.countDownNum, "RAID_WARNING")
-  core.countDownNum = core.countDownNum-1
+function A.countDown()
+  SendChatMessage(A.countDownNum, "RAID_WARNING")
+  A.countDownNum = A.countDownNum-1
 end
 
-function core:SlashCommand(args)
+function A:SlashCommand(args)
   local command, rest = strsplit(" ", args, 2)
   local PORTDB = PlusOneRollTrackerDB
 
   -- RESET
   if command == "reset" then
-    core:ResetData()
-    core:Update()
+    A:ResetData()
+    A:Update()
 
   -- COUNTDOWN
   elseif command == "countdown" or command == "count" or command == "cd" then
     local seconds, rest = strsplit(" ", rest, 2)
-    core.countDownNum = tonumber(seconds)
+    A.countDownNum = tonumber(seconds)
 
     C_Timer.NewTicker(1,
       function()
-        if core.countDownNum < 11 then
-          SendChatMessage(core.countDownNum, "RAID_WARNING")
+        if A.countDownNum < 11 then
+          SendChatMessage(A.countDownNum, "RAID_WARNING")
         end
-        core.countDownNum = core.countDownNum-1
+        A.countDownNum = A.countDownNum-1
       end,
     seconds)
 
@@ -40,46 +40,46 @@ function core:SlashCommand(args)
     table.sort(temp)
 
     if #temp > 0 then
-      core:Print(core.defaults.addonPrefix.." stats.")
+      A:Print(A.defaults.addonPrefix.." stats.")
       for _,v in ipairs(temp) do
-        core:Print("    "..v)
+        A:Print("    "..v)
       end
     else
-      core:Print(core.defaults.addonPrefix .. " no stats to show.")
+      A:Print(A.defaults.addonPrefix .. " no stats to show.")
     end
 
 
   -- CONFIG
   elseif command == "config" or string.find(command, "option") then
-    InterfaceOptionsFrame_OpenToCategory(core.optionsPanel)
-    InterfaceOptionsFrame_OpenToCategory(core.optionsPanel)
+    InterfaceOptionsFrame_OpenToCategory(A.optionsPanel)
+    InterfaceOptionsFrame_OpenToCategory(A.optionsPanel)
 
   -- HELP
   elseif command == "help" then
-    core:Print(core:addonColor("PlusOne RollTracker").." options")
-    core:Print(core:addonColor("/plusone") .. " reset -- Reset addon data (Must be done at the start of each raid)")
-    core:Print(core:addonColor("/plusone") .. " stats -- Shows current +1 stats")
-    core:Print(core:addonColor("/plusone") .. " config -- Shows config panel")
+    A:Print(A:addonColor("PlusOne RollTracker").." options")
+    A:Print(A:addonColor("/plusone") .. " reset -- Reset addon data (Must be done at the start of each raid)")
+    A:Print(A:addonColor("/plusone") .. " stats -- Shows current +1 stats")
+    A:Print(A:addonColor("/plusone") .. " config -- Shows config panel")
 
   else
-    core:Toggle()
+    A:Toggle()
   end
 end
 
 
-function core:Toggle()
-  local menu = core.addon or core:CreateMenu()
+function A:Toggle()
+  local menu = A.addon or A:CreateMenu()
   menu:SetShown(not menu:IsShown())
-  core:Update()
+  A:Update()
 end
 
-function core:Show()
-  local menu = core.addon or core:CreateMenu()
+function A:Show()
+  local menu = A.addon or A:CreateMenu()
   menu:Show()
-  core:Update()
+  A:Update()
 end
 
-function core:Hide()
-  local menu = core.addon or core:CreateMenu()
+function A:Hide()
+  local menu = A.addon or A:CreateMenu()
   menu:Hide()
 end

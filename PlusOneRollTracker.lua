@@ -1,100 +1,70 @@
-local _, core = ...
+local _, A = ...
 
 
-core.framepool = {}
-core.hiddenFrame = CreateFrame("Frame", nil, UIParent)
-core.hiddenFrame:Hide()
+A.framepool = {}
+A.hiddenFrame = CreateFrame("Frame", nil, UIParent)
+A.hiddenFrame:Hide()
 
 
 -- RESET DATA
-function core:ResetData()
+function A:ResetData()
   wipe(PORTDB.rolls)
   wipe(PORTDB.plusOne)
-  core:Print("All " .. core.defaults.addonPrefix .. " data has been reset.")
+  A:Print("All " .. A.defaults.addonPrefix .. " data has been reset.")
 end
 
 
--- PRUNE MONSTERS LOOTED
-function core:PruneMonstersLooted()
-  local time = time()
-  time = (time/60)/60 -- time in hours
-
-  for k, _ in pairs(PORTDB.monstersLooted) do
-    if PORTDB.monstersLooted[k]-time > 3 then PORTDB.monstersLooted[k] = nil end
-  end
-end
-
-
--- CLEAR ROLLS
-function core:ClearRolls()
-  wipe(PORTDB.rolls)
-end
-
-
--- IGNORE ROLL
-function core:IgnoreRoll(name)
-  for _, player in ipairs(PORTDB.rolls) do
-    if player.name == name then
-      player.roll = 0
-      player.plusOne = nil
-      player.ignoreRoll = true
-      return
-    end
-  end
-end
 
 
 -- UPDATE
-function core:Update()
+function A:Update()
 
   -- RESET ALL ROLL FRAMES
-  for i, frame in ipairs(core.framepool) do
-    frame:SetParent(core.hiddenFrame)
-    frame.used = false
-    frame.class:SetText("")
-    frame.playerName = ""
-  end
+  A:ClearFramepool()
 
   -- SORT ROLLTABLE
-  local rolltable = PORTDB.rolls
-  if PORTDB.usePlusOne then
-    table.sort(rolltable, core.sortPlusOne)
-  else
-    table.sort(rolltable, core.sortRegular)
-  end
+  A:SortRolls()
 
 
   -- SET ROLLFRAMES
   for _, player in ipairs(PORTDB.rolls) do
-    local frame = core:GetRollFrame()
+    --if not player.ignoreRoll then
+      local frame = A:GetRollFrame()
 
-    local coloredName = core:colorText(player.name, player.class)
-    local pprefix = PORTDB.plusOne[player.name] and PORTDB.plusOne[player.name] > 0 and "+" or ""
-    frame:SetParent(core.addon.scrollChild)
-    frame:SetHeight(15)
-    frame.name:SetText(coloredName)
-    frame.class:SetText(core.ClassIcons[player.class])
-    frame.used = true
-    frame:Show()
-    frame.playerName = player.name
-    if player.ignoreRoll then
-      frame.roll:SetText(0)
-      frame.plusOne:SetText("")
-    else
-      frame.roll:SetText(player.roll)
-      if PORTDB.usePlusOne then
-        frame.plusOne:SetText(PORTDB.plusOne[player.name] and pprefix ..PORTDB.plusOne[player.name] or "")
-      else
+      local coloredName = A:colorText(player.name, player.class)
+      local pprefix = PORTDB.plusOne[player.name] and PORTDB.plusOne[player.name] > 0 and "+" or ""
+      frame:SetParent(A.addon.scrollChild)
+      frame:SetHeight(15)
+      frame.name:SetText(coloredName)
+      frame.class:SetText(A.ClassIcons[player.class])
+      frame.used = true
+      frame:Show()
+      frame.playerName = player.name
+
+      if player.ignoreRoll then
+        frame.roll:SetText(0)
         frame.plusOne:SetText("")
+        frame.name:SetText(frame.name:GetText() .. " (ignored)")
+      elseif player.passes then
+        frame.roll:SetText("")
+        frame.plusOne:SetText("")
+        frame.name:SetText(frame.name:GetText() .. " (passes)")
+      else
+        frame.roll:SetText(player.roll)
+        if PORTDB.usePlusOne then
+          frame.plusOne:SetText(PORTDB.plusOne[player.name] and pprefix ..PORTDB.plusOne[player.name] or "")
+        else
+          frame.plusOne:SetText("")
+        end
       end
-    end
+    --end
   end
 
   local numFramesActive = 0
-  for _, frame in ipairs(core.framepool) do
+  for _, frame in ipairs(A.framepool) do
     if frame.used then numFramesActive = numFramesActive+1 end
   end
 
-  core.addon.scrollChild:SetHeight(15*numFramesActive)
+  A.addon.scrollChild:SetHeight(15*numFramesActive)
 
 end

@@ -1,6 +1,6 @@
-local _, core = ...
+local _, A = ...
 
-function core:CreateMenu()
+function A:CreateMenu()
   local backdrop = {bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
   edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
   tile = true, tileSize = 16, edgeSize = 16,
@@ -16,7 +16,7 @@ function core:CreateMenu()
   addon:SetScript("OnDragStart", addon.StartMoving)
   addon:SetScript("OnDragStop", addon.StopMovingOrSizing)
   addon:SetScript("OnHide", function(self)
-    core:ClearRolls()
+    A:ClearRolls()
   end)
 
   local title = addon:CreateFontString(nil, "OVERLAY")
@@ -39,8 +39,8 @@ function core:CreateMenu()
   clearBtn:SetSize(60, 25)
   clearBtn:SetText("Clear list")
   clearBtn:SetScript("OnClick", function(self, button)
-    core:ClearRolls()
-    core:Update()
+    A:ClearRolls()
+    A:Update()
   end)
   addon.clearBtn = clearBtn
 
@@ -50,8 +50,8 @@ function core:CreateMenu()
   resetBtn:SetSize(55, 25)
   resetBtn:SetText("Reset +1")
   resetBtn:SetScript("OnClick", function(self, button)
-    core:ResetData()
-    core:Update()
+    A:ResetData()
+    A:Update()
   end)
   addon.resetBtn = resetBtn
 
@@ -61,7 +61,7 @@ function core:CreateMenu()
   plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 2)
   plusoneCB:SetScript("OnClick", function(self, button)
     PORTDB.usePlusOne = self:GetChecked()
-    core:Update()
+    A:Update()
   end)
   plusoneCB:SetChecked(PORTDB.usePlusOne)
   addon.plusOneCB = plusoneCB
@@ -84,7 +84,7 @@ function core:CreateMenu()
   --scrollChild:SetHeight(1000)
   addon.scrollChild = scrollChild
 
-  core:CreateRollFrames(addon)
+  A:CreateRollFrames(addon)
 
 
   scrollFrame:SetScrollChild(scrollChild)
@@ -93,6 +93,6 @@ function core:CreateMenu()
 
   addon:Hide()
 
-  core.addon = addon
-  return core.addon
+  A.addon = addon
+  return A.addon
 end

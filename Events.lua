@@ -1,28 +1,27 @@
-local _, core = ...
-core.loaded = false
-core.itemWaitTable = {}
+local _, A = ...
+A.loaded = false
+A.itemWaitTable = {}
+A.name = "PlusOneRollTracker"
 
-local tempRollTable = {}
 
-
-local events = CreateFrame("Frame")
-events:RegisterEvent("ADDON_LOADED")
-events:RegisterEvent("CHAT_MSG_SYSTEM")
-events:RegisterEvent("CHAT_MSG_RAID_WARNING")
-events:RegisterEvent("CHAT_MSG_RAID_LEADER")
-events:RegisterEvent("CHAT_MSG_RAID")
-events:RegisterEvent("CHAT_MSG_PARTY")
-events:RegisterEvent("LOOT_READY")
-events:RegisterEvent("PLAYER_LOGOUT")
-events:RegisterEvent("PLAYER_ENTERING_WORLD")
-events:RegisterEvent("GET_ITEM_INFO_RECEIVED");
-events:SetScript("OnEvent", function(self, event, ...)
+local E = CreateFrame("Frame")
+E:RegisterEvent("ADDON_LOADED")
+E:RegisterEvent("CHAT_MSG_SYSTEM")
+E:RegisterEvent("CHAT_MSG_RAID_WARNING")
+E:RegisterEvent("CHAT_MSG_RAID_LEADER")
+E:RegisterEvent("CHAT_MSG_RAID")
+E:RegisterEvent("CHAT_MSG_PARTY")
+E:RegisterEvent("LOOT_READY")
+E:RegisterEvent("PLAYER_LOGOUT")
+E:RegisterEvent("PLAYER_ENTERING_WORLD")
+E:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+E:SetScript("OnEvent", function(self, event, ...)
   return self[event] and self[event](self, ...)
 end)
 
 
-function events:ADDON_LOADED(name)
-  if name ~= "PlusOneRollTracker" then return end
+function E:ADDON_LOADED(name)
+  if name ~= A.name then return end
 
   if PlusOneRollTrackerDB == nil then PlusOneRollTrackerDB = {} end
   PORTDB = PlusOneRollTrackerDB
@@ -48,66 +47,73 @@ function events:ADDON_LOADED(name)
   SLASH_PLUSONEROLLTRACKER1= "/+1"
   SLASH_PLUSONEROLLTRACKER2= "/plusone"
   SlashCmdList.PLUSONEROLLTRACKER = function(msg)
-    core:SlashCommand(msg)
+    A:SlashCommand(msg)
   end
 
-  core:CreateOptionsMenu()
-  core:Hide()
+  A:CreateOptionsMenu()
+  A:Hide()
 
-  core:PruneMonstersLooted()
-  core.loaded = true
+  A:PruneMonstersLooted()
+  A.loaded = true
 end
 
-function events:PLAYER_ENTERING_WORLD(login, reloadui)
-  if not core.loaded then return end
+function E:PLAYER_ENTERING_WORLD(login, reloadui)
+  if not A.loaded then return end
   if login or reloadui then
-    core:Print(core.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")
+    A:Print(A.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")
   end
 end
 
 --[[
   ROLL
 ]]
-function events:CHAT_MSG_SYSTEM(msg)
+function E:CHAT_MSG_SYSTEM(msg)
   local pattern = RANDOM_ROLL_RESULT
   pattern = pattern:gsub("%(", "%%(")
   pattern = pattern:gsub("%)", "%%)")
   pattern = pattern:gsub("%%s", "(.+)")
   pattern = pattern:gsub("%%d", "(%%d+)")
 
-  local name, roll, min, max = string.match(msg, pattern)
+  local author, roll, min, max = string.match(msg, pattern)
 
   roll = tonumber(roll)
   min = tonumber(min)
   max = tonumber(max)
 
   if min == 1 and max == 100 then
-    core:Show()
-    for _, player in ipairs(PORTDB.rolls) do
-      if player.name == name then
-        core:IgnoreRoll(player.name)
-        core:Update()
-        return
+    A:Show()
+
+    for i, player in ipairs(PORTDB.rolls) do
+      if player.name == author and player.passes and not player.hasRolled then
+        tremove(PORTDB.rolls, i)
       end
     end
 
-    local _, class = UnitClass(name);
+    for _, player in ipairs(PORTDB.rolls) do
+      if player.name == author and player.hasRolled then
+        player.ignoreRoll = true
+        return A:Update()
+      end
+    end
 
-    local temp = {}
-    temp.name = name
-    temp.roll = roll
-    temp.class = class
-    temp.plusOne = PORTDB.plusOne[name] or 0
+    local _, class = UnitClass(author);
 
-    tinsert(PORTDB.rolls, temp)
-    core:Update()
+    local T = {}
+    T.name = author
+    T.roll = roll
+    T.class = class
+    T.plusOne = PORTDB.plusOne[author] or 0
+    T.hasRolled = true
+
+    tinsert(PORTDB.rolls, T)
+    A:Update()
   end
 end
 
 --[[
   RAID WARNING
 ]]
-function events:CHAT_MSG_RAID_WARNING(msg, author)
+function E:CHAT_MSG_RAID_WARNING(msg, author)
 
   local itemIDPattern = "^|c........|Hitem:(%d*)"
   local plusOnePattern = "%+1$"
@@ -122,69 +128,51 @@ function events:CHAT_MSG_RAID_WARNING(msg, author)
     local itemName, itemLink, itemRarity = GetItemInfo(itemID)
 
     if not itemName then
-      core.itemWaitTable[itemID] = {msg = msg, author = author}
+      A.itemWaitTable[itemID] = {msg = msg, author = author}
       return
     end
 
     if itemRarity < 2 then return end
-    if core.ignoredItems[itemName] then return end
+    if A.ignoredItems[itemName] then return end
 
 
-    core:Show()
-    core.currentRollItem = itemName
-    core:ClearRolls()
-    core:Update()
+    A:Show()
+    A.currentRollItem = itemName
+    A:ClearRolls()
+    A:Update()
 
     if string.find(msg, plusOnePattern) then
-      core:IsPlusOneRoll()
+      A:IsPlusOneRoll()
     else
-      core:NotPlusOneRoll()
+      A:NotPlusOneRoll()
     end
 
   elseif string.find(msg:lower(), rerollPattern) then
-    core:ClearRolls()
-    core:Update()
+    A:ClearRolls()
+    A:Update()
   end
 end
 
 --[[
   RAID MESSAGE
 ]]
-function events:CHAT_MSG_RAID(msg, author)
+function E:CHAT_MSG_RAID(msg, author)
   local passPattern = "pass"
-  local name = string.gsub(author, "%-.*", "")
-  local server = string.gsub(author, ".-%-", "")
-  local _, class = UnitClass(name);
 
   if string.find(msg, passPattern) then
-    -- CHECK IF THEY HAVE ROLLED BEFORE AND IF THEY DID THEN IGNORE THEIR ROLL
-    for _, player in ipairs(PORTDB.rolls) do
-      if player.name == name then
-        core:IgnoreRoll(player.name)
-        return core:Update()
-      end
-    end
+    A:PlayerPasses(author)
 
-    -- WILL ONLY GET HERE IF PLAYER HASNT ROLLED BEFORE
-    wipe(tempRollTable)
-
-    tempRollTable.name = name
-    tempRollTable.roll = 0
-    tempRollTable.class = class
-    tempRollTable.plusOne = PORTDB.plusOne[name] or 0
-
-    tinsert(PORTDB.rolls, tempRollTable)
-
-    core:Update()
+    A:Show()
+    A:Update()
   end
 end
 
-function events:CHAT_MSG_RAID_LEADER(msg, author)
-  events:CHAT_MSG_RAID(msg, author)
+function E:CHAT_MSG_RAID_LEADER(msg, author)
+  E:CHAT_MSG_RAID(msg, author)
 end
 
-function events:CHAT_MSG_PARTY(msg, author)
-  events:CHAT_MSG_RAID(msg, author)
+function E:CHAT_MSG_PARTY(msg, author)
+  E:CHAT_MSG_RAID(msg, author)
 end
 
 
@@ -192,7 +180,7 @@ end
 --[[
   LOOT READY
 ]]
-function events:LOOT_READY(autoloot)
+function E:LOOT_READY(autoloot)
   if not UnitExists("TARGET") then return end
   local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
@@ -202,7 +190,7 @@ function events:LOOT_READY(autoloot)
     local time = time()
     time = (time/60)/60 -- time in hours
 
-    core:PruneMonstersLooted()
+    A:PruneMonstersLooted()
 
     -- construct string of loot links
     if PORTDB.monstersLooted[guid] == nil then -- Havn't looted this monster before
@@ -249,16 +237,16 @@ function events:LOOT_READY(autoloot)
 end
 
 
-function events:PLAYER_LOGOUT()
-  core:PruneMonstersLooted()
+function E:PLAYER_LOGOUT()
+  A:PruneMonstersLooted()
 end
 
 
 
-function events:GET_ITEM_INFO_RECEIVED(itemID, success)
+function E:GET_ITEM_INFO_RECEIVED(itemID, success)
   if success == nil then return end
-  if core.itemWaitTable[itemID] then
-    events:CHAT_MSG_RAID_WARNING(core.itemWaitTable.msg, core.itemWaitTable.author)
-    core.itemWaitTable[itemID] = nil
+  if A.itemWaitTable[itemID] then
+    E:CHAT_MSG_RAID_WARNING(A.itemWaitTable.msg, A.itemWaitTable.author)
+    A.itemWaitTable[itemID] = nil
   end
 end
