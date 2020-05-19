@@ -224,9 +224,9 @@ function E:LOOT_OPENED(autoloot)
       for li = 1, GetNumLootItems() do
         local itemLink = GetLootSlotLink(li)
         if itemLink then
-          local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
+          local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID, itemSubTypeID = GetItemInfo(itemLink)
 
-          if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
+          if not PORTDB.excludeItemType[itemTypeID] or PORTDB.excludeItemType[itemSubTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
             if not string.find(PORTDB.excludeString:lower(), itemName:lower()) then -- IF THE ITEM ISNT IN THE EXCLUDE LIST (INTERFACE OPTIONS)
               if itemRarity <= PORTDB.autolootQuality then -- IF QUALITY IS LESS THAN OR EQUAL TO SET THRESHHOLD
                 for ci = 1, 40 do
