@@ -1,3 +1,11 @@
+4.1
+- Added quest item exclusion
+
+
+4.0
+- Clean up code and made it work somewhat with RClootcouncil
+
+
 3.0
 - Added countdown with slashcommand "/+1 cd 5"
   - Change 5 to whatever number of seconds you want.
