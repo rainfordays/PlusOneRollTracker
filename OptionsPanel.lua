@@ -171,9 +171,26 @@ function A:CreateOptionsMenu()
   containerText:SetText("Exclude containers & bags")
 
 
+  
+
+  local questCB = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
+  questCB:SetSize(25,25)
+  questCB:SetPoint("TOPLEFT", containerCB, "BOTTOMLEFT", 0, -1)
+  questCB:SetScript("OnClick", function(self, button) 
+    PORTDB.excludeItemType[LE_ITEM_CLASS_QUESTITEM] = self:GetChecked()
+  end)
+  questCB:SetChecked(PORTDB.excludeItemType[LE_ITEM_CLASS_QUESTITEM])
+  optionsPanel.questCB = questCB
+
+  local questText = questCB:CreateFontString(nil, "OVERLAY")
+  questText:SetFontObject("GameFontNormal")
+  questText:SetPoint("LEFT", questCB, "RIGHT", 3, 0)
+  questText:SetText("Exclude quests items")
+
+
 
   local excludeHeader = optionsPanel:CreateFontString(nil, "OVERLAY")
-  excludeHeader:SetPoint("TOPLEFT", containerCB, "BOTTOMLEFT", 0, -5)
+  excludeHeader:SetPoint("TOPLEFT", questCB, "BOTTOMLEFT", 0, -5)
   excludeHeader:SetFontObject("GameFontNormal")
   excludeHeader:SetText("Exclude items")
 

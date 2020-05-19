@@ -11,7 +11,7 @@ E:RegisterEvent("CHAT_MSG_RAID_WARNING")
 E:RegisterEvent("CHAT_MSG_RAID_LEADER")
 E:RegisterEvent("CHAT_MSG_RAID")
 E:RegisterEvent("CHAT_MSG_PARTY")
-E:RegisterEvent("LOOT_READY")
+E:RegisterEvent("LOOT_OPENED")
 E:RegisterEvent("PLAYER_LOGOUT")
 E:RegisterEvent("PLAYER_ENTERING_WORLD")
 E:RegisterEvent("GET_ITEM_INFO_RECEIVED");
@@ -120,20 +120,23 @@ function E:CHAT_MSG_RAID_WARNING(msg, author)
   local rerollPattern = "reroll"
 
   if string.find(msg, itemIDPattern) then
-    if string.find(msg, "awarded") then return end
+    if string.find(msg, "was awarded with") then
+      A:ClearRolls()
+      return A:Hide()
+    end
     -- Dont start new roll on raidwarning with multiple items
     if select(2, string.gsub(msg, "Hitem:", '')) > 1 then return end
 
     local itemID = tonumber(string.match(msg, itemIDPattern))
-    local itemName, itemLink, itemRarity = GetItemInfo(itemID)
+    local itemName, _, itemRarity = GetItemInfo(itemID)
 
     if not itemName then
       A.itemWaitTable[itemID] = {msg = msg, author = author}
       return
     end
 
-    if itemRarity < 2 then return end
     if A.ignoredItems[itemName] then return end
+    if itemRarity < 2 then return end
 
 
     A:Show()
@@ -157,13 +160,19 @@ end
   RAID MESSAGE
 ]]
 function E:CHAT_MSG_RAID(msg, author)
-  local passPattern = "pass"
+  local passPattern = "^pass"
+
+  if string.find(msg, "was awarded with") then
+    A:ClearRolls()
+    return A:Update()
+  end
+
 
   if string.find(msg, passPattern) then
     A:PlayerPasses(author)
 
     A:Show()
-    A:Update()
+    return A:Update()
   end
 end
 
@@ -180,7 +189,7 @@ end
 --[[
   LOOT READY
 ]]
-function E:LOOT_READY(autoloot)
+function E:LOOT_OPENED(autoloot)
   if not UnitExists("TARGET") then return end
   local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
@@ -214,8 +223,7 @@ function E:LOOT_READY(autoloot)
     if autoloot == true and PORTDB.autoloot then -- AUTOLOOTING AND SETTING ENABLED
       for li = 1, GetNumLootItems() do
         local itemLink = GetLootSlotLink(li)
-
-        if itemLink ~= nil then
+        if itemLink then
           local itemName, _, itemRarity, _, _, _, _, _, _, _, _, itemTypeID = GetItemInfo(itemLink)
 
           if not PORTDB.excludeItemType[itemTypeID] then -- IF ITEM TYPE IS NOT EXCLUDED
@@ -224,6 +232,7 @@ function E:LOOT_READY(autoloot)
                 for ci = 1, 40 do
                   if GetMasterLootCandidate(li, ci) == UnitName("PLAYER") then
                     GiveMasterLoot(li, ci)
+                    break
                   end
                 end
               end
