@@ -119,7 +119,7 @@ function E:CHAT_MSG_RAID_WARNING(msg, author)
   local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
 
-  if string.find(msg, itemIDPattern) then
+  if msg and string.find(msg, itemIDPattern) then
     if string.find(msg, "was awarded with") then
       A:ClearRolls()
       return A:Hide()
