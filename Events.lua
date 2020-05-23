@@ -60,7 +60,7 @@ end
 function E:PLAYER_ENTERING_WORLD(login, reloadui)
   if not A.loaded then return end
   if login or reloadui then
-    A:Print(A.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")
+    --A:Print(A.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")
   end
 end
 
