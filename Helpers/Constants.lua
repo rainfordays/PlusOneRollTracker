@@ -2,8 +2,8 @@ local _, A = ...
 
 A.defaults = {}
 A.defaults.color = "FF69B4"
-A.defaults.addonPrefix = "|cff".. A.defaults.color .."PlusOne RollTracker|r"
-
+A.defaults.addonName = "|cff".. A.defaults.color .."PlusOne RollTracker|r"
+A.defaults.slash = "|cff"..A.defaults.color .. "/+1|r"
 A.currentRollItem = ""
 
 

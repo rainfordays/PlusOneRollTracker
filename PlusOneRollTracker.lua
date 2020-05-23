@@ -10,7 +10,7 @@ A.hiddenFrame:Hide()
 function A:ResetData()
   wipe(PORTDB.rolls)
   wipe(PORTDB.plusOne)
-  A:Print("All " .. A.defaults.addonPrefix .. " data has been reset.")
+  A:Print("All " .. A.defaults.addonName .. " data has been reset.")
 end
 
 

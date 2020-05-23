@@ -27,29 +27,40 @@ function A:CreateOptionsMenu()
 
 
   local text = optionsPanel:CreateFontString(nil, "OVERLAY")
-  text:SetFontObject("GameFontNormal")
+  text:SetFontObject("GameFontNormalHuge")
   text:SetText("PlusOne RollTracker Options")
-  text:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -30)
+  text:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -10)
+
+  local loginMessage = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
+  loginMessage:SetSize(25,25)
+  loginMessage:SetPoint("BOTTOMLEFT", optionsPanel, "BOTTOMLEFT", 10, 3)
+  loginMessage:SetScript("OnClick", function(self, button)
+    PORTDB.loginMessage = self:GetChecked()
+  end)
+  loginMessage:SetChecked(PORTDB.loginMessage)
+  optionsPanel.loginMessage = loginMessage
+
+  local loginMessageText = loginMessage:CreateFontString(nil, "OVERLAY")
+  loginMessageText:SetFontObject("GameFontNormal")
+  loginMessageText:SetPoint("LEFT", loginMessage, "RIGHT", 3, 0)
+  loginMessageText:SetText("Display login message")
+  optionsPanel.loginMessageText = loginMessageText
 
 
+  local autolootCB = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
+  autolootCB:SetSize(25,25)
+  autolootCB:SetPoint("TOPLEFT", text, "BOTTOMLEFT", 10, -10)
+  autolootCB:SetScript("OnClick", function(self, button)
+    PORTDB.autoloot = self:GetChecked()
+  end)
+  autolootCB:SetChecked(PORTDB.autoloot)
+  optionsPanel.autolootCB = autolootCB
 
-  local autolootFrame = CreateFrame("Frame", nil, optionsPanel)
-  autolootFrame:SetPoint("TOPLEFT", text, "TOPLEFT", 10, -20)
-
-    local autolootCB = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
-    autolootCB:SetSize(25,25)
-    autolootCB:SetPoint("TOPLEFT", text, "BOTTOMLEFT", 10, -25)
-    autolootCB:SetScript("OnClick", function(self, button) 
-      PORTDB.autoloot = self:GetChecked()
-    end)
-    autolootCB:SetChecked(PORTDB.autoloot)
-    optionsPanel.autolootCB = autolootCB
-
-    local autolootText = autolootCB:CreateFontString(nil, "OVERLAY")
-    autolootText:SetFontObject("GameFontNormal")
-    autolootText:SetPoint("LEFT", autolootCB, "RIGHT", 3, 0)
-    autolootText:SetText("Autoloot items to yourself when you are the masterlooter")
-    optionsPanel.autolootText = autolootText
+  local autolootText = autolootCB:CreateFontString(nil, "OVERLAY")
+  autolootText:SetFontObject("GameFontNormal")
+  autolootText:SetPoint("LEFT", autolootCB, "RIGHT", 3, 0)
+  autolootText:SetText("Autoloot items to yourself when you are the masterlooter")
+  optionsPanel.autolootText = autolootText
 
 
   local qualityText = optionsPanel:CreateFontString(nil, "OVERLAY")
@@ -138,7 +149,8 @@ function A:CreateOptionsMenu()
   local rareQualityText = optionsPanel:CreateFontString(nil, "OVERLAY")
   rareQualityText:SetPoint("LEFT", rareQualityCB, "RIGHT", 3, 0)
   rareQualityText:SetFontObject("GameFontNormal")
-  rareQualityText:SetText(A:colorText(ITEM_QUALITY3_DESC, "rare"))  optionsPanel.rareQualityText = rareQualityText
+  rareQualityText:SetText(A:colorText(ITEM_QUALITY3_DESC, "rare"))
+  optionsPanel.rareQualityText = rareQualityText
 
 
   local recipeCB = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
@@ -209,7 +221,7 @@ function A:CreateOptionsMenu()
   
   local excludeFrame = CreateFrame("ScrollFrame", nil, optionsPanel, "UIPanelScrollFrameTemplate")
   excludeFrame:SetPoint("TOPLEFT", excludeHeader, "BOTTOMLEFT", 5, -5)
-  excludeFrame:SetSize(275, 300)
+  excludeFrame:SetSize(275, 280)
   --excludeFrame:SetBackdrop(backdrop)
   -- ON MOUSE ENTER TOOLTIP
   excludeFrame:SetScript("OnEnter", function(self)
@@ -224,7 +236,7 @@ function A:CreateOptionsMenu()
 
   local excludeBG = CreateFrame("Frame", nil, optionsPanel)
   excludeBG:SetPoint("CENTER", excludeFrame, "CENTER")
-  excludeBG:SetSize(285, 310)
+  excludeBG:SetSize(285, 290)
   excludeBG:SetBackdrop(backdrop)
 
 

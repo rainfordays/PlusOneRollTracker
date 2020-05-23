@@ -40,12 +40,12 @@ function A:SlashCommand(args)
     table.sort(temp)
 
     if #temp > 0 then
-      A:Print(A.defaults.addonPrefix.." stats.")
+      A:Print(A.defaults.addonName.." stats.")
       for _,v in ipairs(temp) do
         A:Print("    "..v)
       end
     else
-      A:Print(A.defaults.addonPrefix .. " no stats to show.")
+      A:Print(A.defaults.addonName .. " no stats to show.")
     end
 
 

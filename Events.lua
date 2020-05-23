@@ -27,14 +27,15 @@ function E:ADDON_LOADED(name)
   PORTDB = PlusOneRollTrackerDB
 
   -- Init addon settings if they're missing
-  if not PORTDB.rolls then PORTDB.rolls = {} end
-  if not PORTDB.usePlusOne then PORTDB.usePlusOne = false end
-  if not PORTDB.monstersLooted then PORTDB.monstersLooted = {} end
-  if not PORTDB.plusOne then PORTDB.plusOne = {} end
-  if not PORTDB.autolootQuality then PORTDB.autolootQuality = 3 end
-  if not PORTDB.autoloot then PORTDB.autoloot = false end
-  if not PORTDB.excludeItemType then PORTDB.excludeItemType = {} end
-  if not PORTDB.excludeString then PORTDB.excludeString = "Onyxia Hide Backpack\nHead of Onyxia\nHead of Nefarian" end
+  PORTDB.rolls = PORTDB.rolls or {}
+  PORTDB.usePlusOne = PORTDB.usePlusOne or false
+  PORTDB.monstersLooted = PORTDB.monstersLooted or {}
+  PORTDB.plusOne = PORTDB.plusOne or {}
+  PORTDB.autolootQuality = PORTDB.autolootQuality or 3
+  PORTDB.autoloot = PORTDB.autoloot or false
+  PORTDB.excludeItemType = PORTDB.excludeItemType or {}
+  PORTDB.excludeString = PORTDB.excludeString or "Onyxia Hide Backpack\nHead of Onyxia\nHead of Nefarian"
+  PORTDB.loginMessage = PORTDB.loginMessage or true
 
   local f=InterfaceOptionsFrame
   f:SetMovable(true)
@@ -59,8 +60,8 @@ end
 
 function E:PLAYER_ENTERING_WORLD(login, reloadui)
   if not A.loaded then return end
-  if login or reloadui then
-    --A:Print(A.defaults.addonPrefix .. " loaded. /+1 or /plusone to open addon.")
+  if (login or reloadui) and PORTDB.loginMessage and A.loaded then
+    A:Print(A.defaults.addonName .. " loaded.")
   end
 end
 
