@@ -35,7 +35,7 @@ function E:ADDON_LOADED(name)
   PORTDB.autoloot = PORTDB.autoloot or false
   PORTDB.excludeItemType = PORTDB.excludeItemType or {}
   PORTDB.excludeString = PORTDB.excludeString or "Onyxia Hide Backpack\nHead of Onyxia\nHead of Nefarian"
-  PORTDB.loginMessage = PORTDB.loginMessage ~= nil and PORTDB.loginMessage or true
+  PORTDB.loginMessage = PORTDB.loginMessage or false
 
   local f=InterfaceOptionsFrame
   f:SetMovable(true)
