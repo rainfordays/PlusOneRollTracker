@@ -2,7 +2,7 @@
 ## Title: |cffFF69B4PlusOne RollTracker|r
 ## Author: RainForDays
 ## Notes: Track rolls and +1 status in raids.
-## Version: 4.1
+## Version: 4.2
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter: PORTDB
 

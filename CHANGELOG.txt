@@ -1,3 +1,7 @@
+4.2
+- Added login message setting
+
+
 4.1
 - Added quest item exclusion
 
