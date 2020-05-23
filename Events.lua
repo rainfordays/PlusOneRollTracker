@@ -35,7 +35,7 @@ function E:ADDON_LOADED(name)
   PORTDB.autoloot = PORTDB.autoloot or false
   PORTDB.excludeItemType = PORTDB.excludeItemType or {}
   PORTDB.excludeString = PORTDB.excludeString or "Onyxia Hide Backpack\nHead of Onyxia\nHead of Nefarian"
-  PORTDB.loginMessage = PORTDB.loginMessage or true
+  PORTDB.loginMessage = PORTDB.loginMessage ~= nil and PORTDB.loginMessage or true
 
   local f=InterfaceOptionsFrame
   f:SetMovable(true)
@@ -61,7 +61,7 @@ end
 function E:PLAYER_ENTERING_WORLD(login, reloadui)
   if not A.loaded then return end
   if (login or reloadui) and PORTDB.loginMessage and A.loaded then
-    A:Print(A.defaults.addonName .. " loaded.")
+    A:Print(A.defaults.addonName .. " loaded")
   end
 end
 
