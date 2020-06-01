@@ -1,3 +1,12 @@
+5.0
+- Introduced split MS/OS +1 tracking.
+  - Main window now has 2 additional checkboxes (MS and OS)
+  - +1 when MS is ticked does not count towards +1 when OS is ticked and vice versa
+    - +1 when ONLY "+1" is ticked count for both
+
+- If you want to use the old system and not split then just leave the new checkboxes unticked
+
+
 4.2
 - Added login message setting
 
