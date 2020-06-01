@@ -23,14 +23,15 @@ end)
 function E:ADDON_LOADED(name)
   if name ~= A.name then return end
 
-  if PlusOneRollTrackerDB == nil then PlusOneRollTrackerDB = {} end
-  PORTDB = PlusOneRollTrackerDB
+  PORTDB = PORTDB or {}
 
   -- Init addon settings if they're missing
   PORTDB.rolls = PORTDB.rolls or {}
   PORTDB.usePlusOne = PORTDB.usePlusOne or false
   PORTDB.monstersLooted = PORTDB.monstersLooted or {}
   PORTDB.plusOne = PORTDB.plusOne or {}
+  PORTDB.plusOneMS = PORTDB.plusOneMS or {}
+  PORTDB.plusOneOS = PORTDB.plusOneOS or {}
   PORTDB.autolootQuality = PORTDB.autolootQuality or 3
   PORTDB.autoloot = PORTDB.autoloot or false
   PORTDB.excludeItemType = PORTDB.excludeItemType or {}
@@ -104,6 +105,8 @@ function E:CHAT_MSG_SYSTEM(msg)
     T.roll = roll
     T.class = class
     T.plusOne = PORTDB.plusOne[author] or 0
+    T.plusOneMS = PORTDB.plusOneMS[author] or 0
+    T.plusOneOS = PORTDB.plusOneOS[author] or 0
     T.hasRolled = true
 
     tinsert(PORTDB.rolls, T)
@@ -146,9 +149,9 @@ function E:CHAT_MSG_RAID_WARNING(msg, author)
     A:Update()
 
     if string.find(msg, plusOnePattern) then
-      A:IsPlusOneRoll()
+      A:PlusOneRoll(true)
     else
-      A:NotPlusOneRoll()
+      A:PlusOneRoll(false)
     end
 
   elseif string.find(msg:lower(), rerollPattern) then
@@ -203,7 +206,7 @@ function E:LOOT_OPENED(autoloot)
     A:PruneMonstersLooted()
 
     -- construct string of loot links
-    if PORTDB.monstersLooted[guid] == nil then -- Havn't looted this monster before
+    if PORTDB.monstersLooted[guid] == nil and PORTDB.announceLoot then -- Havn't looted this monster before
       PORTDB.monstersLooted[guid] = time
       local lootstring = ""
       for li = 1, GetNumLootItems() do

@@ -25,21 +25,27 @@ function A.sortRegular(a, b)
 end
 
 function A.sortPlusOne(a, b)
+  a.plusOne = a.plusOne or 0
+  b.plusOne = b.plusOne or 0
   return (a.plusOne < b.plusOne) or (a.plusOne == b.plusOne and a.roll > b.roll)
 end
 
-
-
--- USE PLUSONE
-function A:IsPlusOneRoll()
-  PORTDB.usePlusOne = true
-  A.addon.plusOneCB:SetChecked(true)
+function A.sortPlusOneMS(a, b)
+  a.plusOneMS = a.plusOneMS or 0
+  b.plusOneMS = b.plusOneMS or 0
+  return (a.plusOneMS < b.plusOneMS) or (a.plusOneMS == b.plusOneMS and a.roll > b.roll)
 end
 
--- REGULAR ROLL
-function A:NotPlusOneRoll()
-  PORTDB.usePlusOne = false
-  A.addon.plusOneCB:SetChecked(false)
+function A.sortPlusOneOS(a, b)
+  a.plusOneOS = a.plusOneOS or 0
+  b.plusOneOS = b.plusOneOS or 0
+  return (a.plusOneOS < b.plusOneOS) or (a.plusOneOS == b.plusOneOS and a.roll > b.roll)
+end
+
+
+function A:PlusOneRoll(bool)
+  PORTDB.usePlusOne = bool
+  A.addon.plusOneCB:SetChecked(bool)
 end
 
 
@@ -66,8 +72,14 @@ end
 
 function A:SortRolls()
   if PORTDB.usePlusOne then
-    table.sort(PORTDB.rolls, A.sortPlusOne)
-  else
+    if PORTDB.rollMS then
+      table.sort(PORTDB.rolls, A.sortPlusOneMS)
+    elseif PORTDB.rollOS then
+      table.sort(PORTDB.rolls, A.sortPlusOneOS)
+    else
+      table.sort(PORTDB.rolls, A.sortPlusOne)
+    end
+  else -- not +1
     table.sort(PORTDB.rolls, A.sortRegular)
   end
 end

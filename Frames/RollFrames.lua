@@ -21,15 +21,13 @@ function A:CreateRollFrames(addon)
 
       -- SHIFT + LEFT CLICK
       if IsShiftKeyDown() and button == "LeftButton" then
-        PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
-        if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
+        A:AddPlayerPlusOne(name)
         A:Update()
         return
 
       -- SHIFT + RIGHT CLICK
       elseif IsShiftKeyDown() and button == "RightButton" then
-        PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]-1 or -1
-        if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
+        A:SubPlayerPlusOne(name)
         A:Update()
         return
 
@@ -56,7 +54,7 @@ function A:CreateRollFrames(addon)
 
                         -- BUMP +1
                         if PORTDB.usePlusOne then
-                          PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name]+1 or 1
+                          A:AddPlayerPlusOne(name)
                           self.plusOne:SetText("+"..PORTDB.plusOne[name])
                           A:Update()
                         end

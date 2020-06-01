@@ -7,7 +7,7 @@ function A:CreateMenu()
   insets = { left = 4, right = 4, top = 4, bottom = 4 }}
   -- Frame
   local addon = CreateFrame("Frame", nil, UIParent)
-  addon:SetSize(220, 300)
+  addon:SetSize(220, 320)
   addon:SetPoint("RIGHT", UIParent, "RIGHT", -20, 20)
   addon:SetBackdrop(backdrop)
   addon:SetMovable(true)
@@ -36,8 +36,8 @@ function A:CreateMenu()
 
   local clearBtn = CreateFrame("Button", nil, addon, "UIPanelButtonTemplate")
   clearBtn:SetPoint("BOTTOMRIGHT", addon, "BOTTOMRIGHT", -5, 5)
-  clearBtn:SetSize(60, 25)
-  clearBtn:SetText("Clear list")
+  clearBtn:SetSize(40, 25)
+  clearBtn:SetText("Clear")
   clearBtn:SetScript("OnClick", function(self, button)
     A:ClearRolls()
     A:Update()
@@ -57,8 +57,8 @@ function A:CreateMenu()
 
 
   local plusoneCB = CreateFrame("CheckButton", nil, addon, "UICheckButtonTemplate")
-  plusoneCB:SetSize(30,30)
-  plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 2)
+  plusoneCB:SetSize(25, 25)
+  plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 5)
   plusoneCB:SetScript("OnClick", function(self, button)
     PORTDB.usePlusOne = self:GetChecked()
     A:Update()
@@ -66,17 +66,61 @@ function A:CreateMenu()
   plusoneCB:SetChecked(PORTDB.usePlusOne)
   addon.plusOneCB = plusoneCB
 
-  local cbText = plusoneCB:CreateFontString(nil, "OVERLAY")
-  cbText:SetPoint("LEFT", plusoneCB, "RIGHT", 3)
-  cbText:SetFontObject("GameFontNormalSmall")
-  cbText:SetText("+1 roll")
-  addon.cbText = cbText
+  local plusOneText = plusoneCB:CreateFontString(nil, "OVERLAY")
+  plusOneText:SetPoint("BOTTOM", plusoneCB, "TOP", 0, -3)
+  plusOneText:SetFontObject("GameFontNormalSmall")
+  plusOneText:SetText("+1")
+  addon.plusOneText = plusOneText
+
+
+  local MSCB = CreateFrame("CheckButton", nil, addon, "UICheckButtonTemplate")
+  MSCB:SetSize(25, 25)
+  MSCB:SetPoint("LEFT", plusoneCB, "RIGHT", 1)
+  MSCB:SetScript("OnClick", function(self, button)
+    PORTDB.rollMS = self:GetChecked()
+    if PORTDB.rollOS then
+      PORTDB.rollOS = false
+      addon.OSCB:SetChecked(false)
+    end
+    A:Update()
+  end)
+  MSCB:SetChecked(PORTDB.usePlusOne)
+  addon.MSCB = MSCB
+
+  local MSText = MSCB:CreateFontString(nil, "OVERLAY")
+  MSText:SetPoint("BOTTOM", MSCB, "TOP", 0, -3)
+  MSText:SetFontObject("GameFontNormalSmall")
+  MSText:SetText("MS")
+  addon.MSText = MSText
+
+
+  local OSCB = CreateFrame("CheckButton", nil, addon, "UICheckButtonTemplate")
+  OSCB:SetSize(25, 25)
+  OSCB:SetPoint("LEFT", MSCB, "RIGHT", -2, 0)
+  OSCB:SetScript("OnClick", function(self, button)
+    PORTDB.rollOS = self:GetChecked()
+    if PORTDB.rollMS then
+      PORTDB.rollMS = false
+      addon.MSCB:SetChecked(false)
+    end
+    A:Update()
+  end)
+  OSCB:SetChecked(PORTDB.usePlusOne)
+  addon.OSCB = OSCB
+
+  local OSText = OSCB:CreateFontString(nil, "OVERLAY")
+  OSText:SetPoint("BOTTOM", OSCB, "TOP", 0, -3)
+  OSText:SetFontObject("GameFontNormalSmall")
+  OSText:SetText("OS")
+  addon.OSText = OSText
+
+
 
 
 
   local scrollFrame = CreateFrame("ScrollFrame", nil, addon, "UIPanelScrollFrameTemplate")
   scrollFrame:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 5, -7)
-  scrollFrame:SetPoint("BOTTOMRIGHT", clearBtn, "TOPRIGHT", -24, 2)
+  scrollFrame:SetPoint("BOTTOMRIGHT", clearBtn, "TOPRIGHT", -24, 10)
   addon.scrollFrame = scrollFrame
 
   local scrollChild = CreateFrame("Frame")

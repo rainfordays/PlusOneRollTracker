@@ -10,6 +10,8 @@ A.hiddenFrame:Hide()
 function A:ResetData()
   wipe(PORTDB.rolls)
   wipe(PORTDB.plusOne)
+  wipe(PORTDB.plusOneMS)
+  wipe(PORTDB.plusOneOS)
   A:Print("All " .. A.defaults.addonName .. " data has been reset.")
 end
 
@@ -18,6 +20,11 @@ end
 
 -- UPDATE
 function A:Update()
+  for _, player in ipairs(PORTDB.rolls) do
+    player.plusOne = PORTDB.plusOne[player.name]
+    player.plusOneMS = PORTDB.plusOneMS[player.name]
+    player.plusOneOS = PORTDB.plusOneOS[player.name]
+  end
 
   -- RESET ALL ROLL FRAMES
   A:ClearFramepool()
@@ -51,11 +58,7 @@ function A:Update()
         frame.name:SetText(frame.name:GetText() .. " (passes)")
       else
         frame.roll:SetText(player.roll)
-        if PORTDB.usePlusOne then
-          frame.plusOne:SetText(PORTDB.plusOne[player.name] and pprefix ..PORTDB.plusOne[player.name] or "")
-        else
-          frame.plusOne:SetText("")
-        end
+        frame.plusOne:SetText(A:GetPlayerPlusOne(player.name))
       end
     --end
   end
@@ -67,4 +70,60 @@ function A:Update()
 
   A.addon.scrollChild:SetHeight(15*numFramesActive)
 
+end
+
+
+function A:GetPlayerPlusOne(name)
+  local usePlusOne = PORTDB.usePlusOne
+  local rollMS = PORTDB.rollMS
+  local rollOS = PORTDB.rollOS
+  local playerPlusOneMS = PORTDB.plusOneMS[name]
+  local playerPlusOneOS = PORTDB.plusOneOS[name]
+  local playerPlusOne = PORTDB.plusOne[name]
+
+  if usePlusOne then
+    if rollMS and playerPlusOneMS then
+      return playerPlusOneMS
+    elseif rollOS and playerPlusOneOS then
+      return playerPlusOneOS
+    elseif playerPlusOne then
+      return playerPlusOne
+    end
+  else
+    return ""
+  end
+end
+
+
+
+
+function A:AddPlayerPlusOne(name)
+  if PORTDB.usePlusOne then
+    if PORTDB.rollMS then
+      PORTDB.plusOneMS[name] = PORTDB.plusOneMS[name] and PORTDB.plusOneMS[name] + 1 or 1
+      if PORTDB.plusOneMS[name] == 0 then PORTDB.plusOneMS[name] = nil end
+    elseif PORTDB.rollOS then
+      PORTDB.plusOneOS[name] = PORTDB.plusOneOS[name] and PORTDB.plusOneOS[name] + 1 or 1
+      if PORTDB.plusOneOS[name] == 0 then PORTDB.plusOneOS[name] = nil end
+    else
+      PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name] + 1 or 1
+      if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
+    end
+  end
+end
+
+
+function A:SubPlayerPlusOne(name)
+  if PORTDB.usePlusOne then
+    if PORTDB.rollMS then
+      PORTDB.plusOneMS[name] = PORTDB.plusOneMS[name] and PORTDB.plusOneMS[name] - 1 or 1
+      if PORTDB.plusOneMS[name] == 0 then PORTDB.plusOneMS[name] = nil end
+    elseif PORTDB.rollOS then
+      PORTDB.plusOneOS[name] = PORTDB.plusOneOS[name] and PORTDB.plusOneOS[name] - 1 or 1
+      if PORTDB.plusOneOS[name] == 0 then PORTDB.plusOneOS[name] = nil end
+    else
+      PORTDB.plusOne[name] = PORTDB.plusOne[name] and PORTDB.plusOne[name] - 1 or 1
+      if PORTDB.plusOne[name] == 0 then PORTDB.plusOne[name] = nil end
+    end
+  end
 end

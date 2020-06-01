@@ -31,21 +31,6 @@ function A:CreateOptionsMenu()
   text:SetText("PlusOne RollTracker Options")
   text:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -10)
 
-  local loginMessage = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
-  loginMessage:SetSize(25,25)
-  loginMessage:SetPoint("BOTTOMLEFT", optionsPanel, "BOTTOMLEFT", 10, 3)
-  loginMessage:SetScript("OnClick", function(self, button)
-    PORTDB.loginMessage = self:GetChecked()
-  end)
-  loginMessage:SetChecked(PORTDB.loginMessage)
-  optionsPanel.loginMessage = loginMessage
-
-  local loginMessageText = loginMessage:CreateFontString(nil, "OVERLAY")
-  loginMessageText:SetFontObject("GameFontNormal")
-  loginMessageText:SetPoint("LEFT", loginMessage, "RIGHT", 3, 0)
-  loginMessageText:SetText("Display login message")
-  optionsPanel.loginMessageText = loginMessageText
-
 
   local autolootCB = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
   autolootCB:SetSize(25,25)
@@ -61,6 +46,24 @@ function A:CreateOptionsMenu()
   autolootText:SetPoint("LEFT", autolootCB, "RIGHT", 3, 0)
   autolootText:SetText("Autoloot items to yourself when you are the masterlooter")
   optionsPanel.autolootText = autolootText
+
+
+
+  local announceLoot = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
+  announceLoot:SetSize(25,25)
+  announceLoot:SetPoint("LEFT", autolootText, "RIGHT", 10, 0)
+  announceLoot:SetScript("OnClick", function(self, button)
+    PORTDB.announceLoot = self:GetChecked()
+  end)
+  announceLoot:SetChecked(PORTDB.announceLoot or false)
+  optionsPanel.announceLoot = announceLoot
+
+  local announceLootText = announceLoot:CreateFontString(nil, "OVERLAY")
+  announceLootText:SetFontObject("GameFontNormal")
+  announceLootText:SetPoint("LEFT", announceLoot, "RIGHT", 3, 0)
+  announceLootText:SetText("Announce loot")
+  optionsPanel.announceLootText = announceLootText
+
 
 
   local qualityText = optionsPanel:CreateFontString(nil, "OVERLAY")
@@ -258,6 +261,36 @@ function A:CreateOptionsMenu()
 
   excludeFrame:SetScrollChild(exclude)
   optionsPanel.exclude = exclude
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  local loginMessage = CreateFrame("CheckButton", nil, optionsPanel, "UICheckButtonTemplate")
+  loginMessage:SetSize(25,25)
+  loginMessage:SetPoint("BOTTOMLEFT", optionsPanel, "BOTTOMLEFT", 10, 3)
+  loginMessage:SetScript("OnClick", function(self, button)
+    PORTDB.loginMessage = self:GetChecked()
+  end)
+  loginMessage:SetChecked(PORTDB.loginMessage)
+  optionsPanel.loginMessage = loginMessage
+
+  local loginMessageText = loginMessage:CreateFontString(nil, "OVERLAY")
+  loginMessageText:SetFontObject("GameFontNormal")
+  loginMessageText:SetPoint("LEFT", loginMessage, "RIGHT", 3, 0)
+  loginMessageText:SetText("Display login message")
+  optionsPanel.loginMessageText = loginMessageText
+  
 
 
 
