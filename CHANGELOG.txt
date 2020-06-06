@@ -1,3 +1,10 @@
+5.1
+- Removed alt-click and shiftclick handlers on the names of rollers
+- Shift clicking now awards item being rolled on
+- Item being rolled on is now displayed at the top of the addon
+- Clean up checkboxes enabled/disabled states
+- Now reacts to +1/MS/OS in raidwarning after an itemlink to automatically check the correct checkboxes
+
 5.0
 - Introduced split MS/OS +1 tracking.
   - Main window now has 2 additional checkboxes (MS and OS)
