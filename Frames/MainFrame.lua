@@ -25,6 +25,12 @@ function A:CreateMenu()
   title:SetText("+1 RollTracker")
   addon.title = title
 
+  local currentRollItem = addon:CreateFontString(nil, "OVERLAY")
+  currentRollItem:SetPoint("TOPLEFT", addon, "TOPLEFT", 10, 12)
+  currentRollItem:SetFontObject("GameFontNormal")
+  currentRollItem:SetText("")
+  addon.currentRollItem = currentRollItem
+
   local closeBtn = CreateFrame("Button", nil, addon, "UIPanelCloseButton")
   closeBtn:SetSize(32,32)
   closeBtn:SetPoint("TOPRIGHT", addon, "TOPRIGHT", 1, 1)
@@ -60,7 +66,7 @@ function A:CreateMenu()
   plusoneCB:SetSize(25, 25)
   plusoneCB:SetPoint("BOTTOMLEFT", addon, "BOTTOMLEFT", 5, 5)
   plusoneCB:SetScript("OnClick", function(self, button)
-    PORTDB.usePlusOne = self:GetChecked()
+    A:PlusOneRoll(self:GetChecked())
     A:Update()
   end)
   plusoneCB:SetChecked(PORTDB.usePlusOne)
@@ -77,14 +83,10 @@ function A:CreateMenu()
   MSCB:SetSize(25, 25)
   MSCB:SetPoint("LEFT", plusoneCB, "RIGHT", 1)
   MSCB:SetScript("OnClick", function(self, button)
-    PORTDB.rollMS = self:GetChecked()
-    if PORTDB.rollOS then
-      PORTDB.rollOS = false
-      addon.OSCB:SetChecked(false)
-    end
+    A:PlusOneMSRoll(self:GetChecked())
     A:Update()
   end)
-  MSCB:SetChecked(PORTDB.usePlusOne)
+  MSCB:SetChecked(PORTDB.rollMS)
   addon.MSCB = MSCB
 
   local MSText = MSCB:CreateFontString(nil, "OVERLAY")
@@ -98,14 +100,10 @@ function A:CreateMenu()
   OSCB:SetSize(25, 25)
   OSCB:SetPoint("LEFT", MSCB, "RIGHT", -2, 0)
   OSCB:SetScript("OnClick", function(self, button)
-    PORTDB.rollOS = self:GetChecked()
-    if PORTDB.rollMS then
-      PORTDB.rollMS = false
-      addon.MSCB:SetChecked(false)
-    end
+    A:PlusOneOSRoll(self:GetChecked())
     A:Update()
   end)
-  OSCB:SetChecked(PORTDB.usePlusOne)
+  OSCB:SetChecked(PORTDB.rollOS)
   addon.OSCB = OSCB
 
   local OSText = OSCB:CreateFontString(nil, "OVERLAY")
