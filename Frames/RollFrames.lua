@@ -18,22 +18,8 @@ function A:CreateRollFrames(addon)
     tempFrame:SetScript("OnMouseDown", function(self, button)
       local name = self.playerName
 
-
       -- SHIFT + LEFT CLICK
       if IsShiftKeyDown() and button == "LeftButton" then
-        A:AddPlayerPlusOne(name)
-        A:Update()
-        return
-
-      -- SHIFT + RIGHT CLICK
-      elseif IsShiftKeyDown() and button == "RightButton" then
-        A:SubPlayerPlusOne(name)
-        A:Update()
-        return
-
-
-      -- ALT + LEFT CLICK
-      elseif (IsAltKeyDown() and (button == "LeftButton")) or button == "MiddleButton" then
 
         local lootmethod, masterlooterPartyID, masterlooterRaidID = GetLootMethod()
 
@@ -59,6 +45,7 @@ function A:CreateRollFrames(addon)
                           A:Update()
                         end
                         A.currentRollItem = ""
+                        A.addon.currentRollItem:SetText("")
                         return
                       end
                     end
@@ -68,11 +55,6 @@ function A:CreateRollFrames(addon)
             end -- / loop through lootwindow
           end
         end
-
-      -- RIGHT CLICK
-      elseif button == "RightButton" then
-        A:IgnoreRoll(name)
-        A:Update()
       end
     end)
 
