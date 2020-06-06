@@ -120,8 +120,8 @@ end
 function E:CHAT_MSG_RAID_WARNING(msg, author)
 
   local itemIDPattern = "^|c........|Hitem:(%d*)"
-  local plusOnePattern = "%+1$"
   local rerollPattern = "reroll"
+  local itemLinkPattern = "|c.*|r"
 
   if msg and string.find(msg, itemIDPattern) then
     if string.find(msg, "was awarded with") then
@@ -131,27 +131,41 @@ function E:CHAT_MSG_RAID_WARNING(msg, author)
     -- Dont start new roll on raidwarning with multiple items
     if select(2, string.gsub(msg, "Hitem:", '')) > 1 then return end
 
-    local itemID = tonumber(string.match(msg, itemIDPattern))
-    local itemName, _, itemRarity = GetItemInfo(itemID)
 
+    -- Assert item identification
+    local itemID = tonumber(string.match(msg, itemIDPattern))
+    local itemName, itemLink, itemRarity = GetItemInfo(itemID)
+
+    -- Not loaded by cache so send the item to waiting table
     if not itemName then
       A.itemWaitTable[itemID] = {msg = msg, author = author}
       return
     end
 
+    -- If item is on ignore list then exit thread
     if A.ignoredItems[itemName] then return end
+    -- Item quality is less than uncommon so exit thread
     if itemRarity < 2 then return end
-
 
     A:Show()
     A.currentRollItem = itemName
+    A.addon.currentRollItem:SetText(itemLink)
     A:ClearRolls()
     A:Update()
 
-    if string.find(msg, plusOnePattern) then
+    local params = string.gsub(msg, itemLinkPattern, "")
+    if string.find(params, "+1") then
       A:PlusOneRoll(true)
     else
       A:PlusOneRoll(false)
+    end
+
+    if string.find(params:lower(), "ms") then
+      A:PlusOneMSRoll(true)
+    end
+
+    if string.find(params:lower(), "os") then
+      A:PlusOneOSRoll(true)
     end
 
   elseif string.find(msg:lower(), rerollPattern) then
