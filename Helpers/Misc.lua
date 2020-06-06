@@ -46,6 +46,32 @@ end
 function A:PlusOneRoll(bool)
   PORTDB.usePlusOne = bool
   A.addon.plusOneCB:SetChecked(bool)
+
+  if bool == false then
+    A.addon.MSCB:Disable()
+    A.addon.OSCB:Disable()
+  else
+    A.addon.MSCB:Enable()
+    A.addon.OSCB:Enable()
+  end
+end
+
+function A:PlusOneMSRoll(bool)
+  PORTDB.rollMS = bool
+  A.addon.MSCB:SetChecked(bool)
+  if bool == true then
+    PORTDB.rollOS = not bool
+    A.addon.OSCB:SetChecked(not bool)
+  end
+end
+
+function A:PlusOneOSRoll(bool)
+  PORTDB.rollOS = bool
+  A.addon.OSCB:SetChecked(bool)
+  if bool == true then
+    PORTDB.rollMS = not bool
+    A.addon.MSCB:SetChecked(not bool)
+  end
 end
 
 
