@@ -168,7 +168,7 @@ function E:CHAT_MSG_RAID_WARNING(msg, author)
       A:PlusOneOSRoll(true)
     end
 
-  elseif string.find(msg:lower(), rerollPattern) then
+  elseif msg and string.find(msg:lower(), rerollPattern) then
     A:ClearRolls()
     A:Update()
   end

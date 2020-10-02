@@ -32,19 +32,35 @@ function A:SlashCommand(args)
 
   -- STATS
   elseif command == "stats" then
-    local temp = {}
+    local count = 0
 
-    for k,v in pairs(PORTDB.plusOne) do
-      tinsert(temp, k .. "+"..v)
-    end
-    table.sort(temp)
 
-    if #temp > 0 then
-      A:Print(A.defaults.addonName.." stats.")
-      for _,v in ipairs(temp) do
-        A:Print("    "..v)
+    if A:Count(PORTDB.plusOne) > 0 then
+      A:Print("PlusOne")
+      for name, v in pairs(PORTDB.plusOne) do
+        Print(name, " +", v)
+        count = count + 1
       end
-    else
+    end
+
+    if A:Count(PORTDB.plusOneMS) > 0 then
+      A:Print("PlusOne MS")
+      for name, v in pairs(PORTDB.plusOneMS) do
+        Print(name, " +", v)
+        count = count + 1
+      end
+    end
+
+    if A:Count(PORTDB.plusOneOS) > 0 then
+      A:Print("PlusOne OS")
+      for name, v in pairs(PORTDB.plusOneOS) do
+        Print(name, " +", v)
+        count = count + 1
+      end
+    end
+
+
+    if count = 0 then
       A:Print(A.defaults.addonName .. " no stats to show.")
     end
 
@@ -82,4 +98,13 @@ end
 function A:Hide()
   local menu = A.addon or A:CreateMenu()
   menu:Hide()
+end
+
+
+function A:Count(t)
+  local i = 0
+  for _, _ in pairs(t) do
+    i = i + 1
+  end
+  return i
 end
