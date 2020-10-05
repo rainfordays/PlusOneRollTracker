@@ -60,7 +60,7 @@ function A:SlashCommand(args)
     end
 
 
-    if count = 0 then
+    if count == 0 then
       A:Print(A.defaults.addonName .. " no stats to show.")
     end
 
